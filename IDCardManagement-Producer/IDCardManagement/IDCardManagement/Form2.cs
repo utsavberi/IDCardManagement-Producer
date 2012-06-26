@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
+using WinFormCharpWebCam;
 
 namespace IDCardManagement
 {
@@ -26,7 +27,7 @@ namespace IDCardManagement
         public Form2()
         {
             InitializeComponent();
-
+            webcamStatus = 0;
         }
 
         //called in "new" subroutine
@@ -82,6 +83,8 @@ namespace IDCardManagement
             loadDataGrid(idcard.connectionString);
 
             printToolStripButton.Enabled = true;
+            webcamToolStripButton.Enabled = true;
+            saveToolStripButton.Enabled = true;
             panel1.Size = new Size(idcard.dimensions.Width * 10, idcard.dimensions.Height * 10);
             panel1.Left = ((this.Width - panel1.Width - dataGridView1.Width) / 2) - 20;
             panel1.Top = (this.Height - panel1.Height) / 2;
@@ -178,6 +181,7 @@ namespace IDCardManagement
                                         // Convert byte[] to Image
                                         ms.Write(imageBytes, 0, imageBytes.Length);
                                         backgroundImage = Image.FromStream(ms, true);
+                                        ms.Close();
 
                                     }
                                     title = reader.GetAttribute("title");
@@ -328,72 +332,133 @@ namespace IDCardManagement
 
         }
 
+        private byte[] ConvertImageToByteArray(System.Drawing.Image imageToConvert,
+                                       System.Drawing.Imaging.ImageFormat formatOfImage)
+        {
+            byte[] Ret;
+            //try
+            {
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    imageToConvert.Save(ms, formatOfImage);
+                    Ret = ms.ToArray();
+                }
+            }
+            //catch (Exception ex) { Console.WriteLine(ex.Message); ; }
+            return Ret;
+        }
+
         //save
         private void saveToolStripButton_Click(object sender, EventArgs e)
         {
 
-            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
-                using (XmlWriter wrt = XmlWriter.Create(saveFileDialog1.FileName))
-                {
-                    this.Text = openFileDialog1.FileName + " - IDCard Producer";
-                    wrt.WriteStartDocument();
-                    wrt.WriteStartElement("panel");
-                    foreach (Control ctl in this.panel1.Controls)
-                    {
-                        if (ctl is Label)
-                        {
-                            wrt.WriteStartElement("label");
-                            wrt.WriteAttributeString("text", ((Label)ctl).Text);
-                            wrt.WriteAttributeString("top", ((Label)ctl).Top.ToString());
-                            wrt.WriteAttributeString("left", ((Label)ctl).Left.ToString());
-                            wrt.WriteAttributeString("backcolor", ((Label)ctl).BackColor.ToArgb().ToString()); //Color.FromArgb(int);
-                            wrt.WriteAttributeString("forecolor", ((Label)ctl).ForeColor.ToArgb().ToString());
-                            wrt.WriteAttributeString("font", TypeDescriptor.GetConverter(typeof(Font)).ConvertToString(((Label)ctl).Font)); //Font font = (Font)converter.ConvertFromString(fontString);
-                            wrt.WriteEndElement();
+            //using (SqlCeConnection con = new SqlCeConnection(idcard.connectionString))
+            //{
 
-                        }
-                        if (ctl is PictureBox)
-                        {
-                            wrt.WriteStartElement("pictureBox");
-                            wrt.WriteAttributeString("left", ((PictureBox)ctl).Left.ToString());
-                            wrt.WriteAttributeString("top", ((PictureBox)ctl).Top.ToString());
-                            wrt.WriteAttributeString("height", ((PictureBox)ctl).Height.ToString());
-                            wrt.WriteAttributeString("width", ((PictureBox)ctl).Width.ToString());
-                            wrt.WriteEndElement();
-                        }
+            //    string tmp = "if not exists (select * from sysobjects where name='" + idcard.tableName + "extra' and xtype='U')";
+            //    con.Open();
+            //    try{
+            //        using (SqlCeCommand cmd = new SqlCeCommand("  create table " + idcard.tableName + "extra ( pic1 varbinary(8000) )", con))
+            //    {
+            //        cmd.ExecuteNonQuery();
+            //    }}
+            //    catch(SqlCeException ex)
+            //    {
+            //        Console.WriteLine("myerror :"+ex.Message);
+            //    }
 
-                    }
+            //    try
+            //    {
+            //        using (SqlCeCommand cmd2 = new SqlCeCommand("Insert into " + idcard.tableName + "extra (pic1) Values (@Pic)", con))
+            //        {
 
-                    wrt.WriteStartElement("idCard");
-                    wrt.WriteAttributeString("connectionString", idcard.connectionString);
-                    wrt.WriteAttributeString("height", idcard.dimensions.Height.ToString());
-                    wrt.WriteAttributeString("width", idcard.dimensions.Width.ToString());
-                    wrt.WriteAttributeString("tableName", idcard.tableName);
-                    wrt.WriteAttributeString("title", label1.Text);//idcard.title
-                    string imagebase64String;
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        idcard.backgroundImage.Save(ms, idcard.backgroundImage.RawFormat);
-                        byte[] imageBytes = ms.ToArray();
-                        imagebase64String = Convert.ToBase64String(imageBytes);
-                    }
-                    wrt.WriteAttributeString("backgroundImage", imagebase64String);
-                    foreach (string str in idcard.fields)
-                    {
+            //            cmd2.Parameters.Add("Pic", SqlDbType.Image, 0).Value =
+            //                ConvertImageToByteArray(pictureBox1.BackgroundImage, System.Drawing.Imaging.ImageFormat.Jpeg);
+            //            cmd2.ExecuteNonQuery();
 
-                        wrt.WriteElementString("field", str);
+            //        }
+            //    }
+            //    catch (SqlCeException ex)
+            //    {
+            //        Console.WriteLine("myerror2 :" + ex.Message);
+            //    }
 
-                        wrt.WriteElementString("field", str);
+            //    using (SqlCeCommand cmd3 = new SqlCeCommand("select * from "+idcard.tableName+"extra ",con)) {
+            //        SqlCeDataReader reader= cmd3.ExecuteReader();
+            //        reader.Read();
+            //        byte[] imageBytes = (byte[])(reader["pic1"]);
+            //        MemoryStream ms = new MemoryStream(imageBytes,0,imageBytes.Length);//, );
+            //        // Convert byte[] to Image
+            //        ms.Write(imageBytes, 0, imageBytes.Length);
+            //        panel1.BackgroundImage  = Image.FromStream(ms, true);
+            //        ms.Close();
+            //        //panel1.BackgroundImage = Image.FromStream(new by);//((byte[])reader["pic1"]));
+            //    }
+            //} 
+            #region
+            //if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            //    using (XmlWriter wrt = XmlWriter.Create(saveFileDialog1.FileName))
+            //    {
+            //        this.Text = openFileDialog1.FileName + " - IDCard Producer";
+            //        wrt.WriteStartDocument();
+            //        wrt.WriteStartElement("panel");
+            //        foreach (Control ctl in this.panel1.Controls)
+            //        {
+            //            if (ctl is Label)
+            //            {
+            //                wrt.WriteStartElement("label");
+            //                wrt.WriteAttributeString("text", ((Label)ctl).Text);
+            //                wrt.WriteAttributeString("top", ((Label)ctl).Top.ToString());
+            //                wrt.WriteAttributeString("left", ((Label)ctl).Left.ToString());
+            //                wrt.WriteAttributeString("backcolor", ((Label)ctl).BackColor.ToArgb().ToString()); //Color.FromArgb(int);
+            //                wrt.WriteAttributeString("forecolor", ((Label)ctl).ForeColor.ToArgb().ToString());
+            //                wrt.WriteAttributeString("font", TypeDescriptor.GetConverter(typeof(Font)).ConvertToString(((Label)ctl).Font)); //Font font = (Font)converter.ConvertFromString(fontString);
+            //                wrt.WriteEndElement();
 
-                    }
-                    foreach (string str in idcard.selectedFields)
-                    {
-                        wrt.WriteElementString("selectedField", str);
-                    }
-                    wrt.WriteEndElement();//idcard
-                    wrt.WriteEndElement();//panel
-                    wrt.WriteEndDocument();
-                }
+            //            }
+            //            if (ctl is PictureBox)
+            //            {
+            //                wrt.WriteStartElement("pictureBox");
+            //                wrt.WriteAttributeString("left", ((PictureBox)ctl).Left.ToString());
+            //                wrt.WriteAttributeString("top", ((PictureBox)ctl).Top.ToString());
+            //                wrt.WriteAttributeString("height", ((PictureBox)ctl).Height.ToString());
+            //                wrt.WriteAttributeString("width", ((PictureBox)ctl).Width.ToString());
+            //                wrt.WriteEndElement();
+            //            }
+
+            //        }
+
+            //        wrt.WriteStartElement("idCard");
+            //        wrt.WriteAttributeString("connectionString", idcard.connectionString);
+            //        wrt.WriteAttributeString("height", idcard.dimensions.Height.ToString());
+            //        wrt.WriteAttributeString("width", idcard.dimensions.Width.ToString());
+            //        wrt.WriteAttributeString("tableName", idcard.tableName);
+            //        wrt.WriteAttributeString("title", label1.Text);//idcard.title
+            //        string imagebase64String;
+            //        using (MemoryStream ms = new MemoryStream())
+            //        {
+            //            idcard.backgroundImage.Save(ms, idcard.backgroundImage.RawFormat);
+            //            byte[] imageBytes = ms.ToArray();
+            //            imagebase64String = Convert.ToBase64String(imageBytes);
+            //        }
+            //        wrt.WriteAttributeString("backgroundImage", imagebase64String);
+            //        foreach (string str in idcard.fields)
+            //        {
+
+            //            wrt.WriteElementString("field", str);
+
+            //            wrt.WriteElementString("field", str);
+
+            //        }
+            //        foreach (string str in idcard.selectedFields)
+            //        {
+            //            wrt.WriteElementString("selectedField", str);
+            //        }
+            //        wrt.WriteEndElement();//idcard
+            //        wrt.WriteEndElement();//panel
+            //        wrt.WriteEndDocument();
+            //    }
+            #endregion
         }
 
 
@@ -471,6 +536,28 @@ namespace IDCardManagement
         {
             Print();
         }
+
+        WebCam webcam;
+        int webcamStatus;
+        private void toolStripButton3_Click(object sender, EventArgs e)
+        {
+            if (pictureBox1 != null && webcamStatus == 0)
+            {
+                webcam = new WebCam();
+                webcam.InitializeWebCam(ref pictureBox1);
+                webcam.Start();
+                webcamStatus = 1;
+                toolStripStatusLabel1.Text = "Click on 'Capture Image' button again to capture image";
+
+            }
+            else 
+            {
+                webcam.Stop(); webcamStatus = 0;
+                
+            }
+        }
+
+        
 
     }
 }

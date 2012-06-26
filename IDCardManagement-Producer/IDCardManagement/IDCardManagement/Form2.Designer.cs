@@ -16,6 +16,8 @@
             if (disposing && (components != null))
             {
                 components.Dispose();
+                MemoryImage.Dispose();
+                
             }
             base.Dispose(disposing);
         }
@@ -44,6 +46,7 @@
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.printToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.webcamToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
@@ -70,6 +73,7 @@
             this.printDocument1 = new System.Drawing.Printing.PrintDocument();
             this.printPreviewDialog1 = new System.Windows.Forms.PrintPreviewDialog();
             this.printDialog1 = new System.Windows.Forms.PrintDialog();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
@@ -101,7 +105,9 @@
             this.toolStripButton1,
             this.toolStripButton2,
             this.toolStripSeparator2,
-            this.printToolStripButton});
+            this.printToolStripButton,
+            this.webcamToolStripButton,
+            this.toolStripSeparator4});
             this.toolStrip1.Location = new System.Drawing.Point(0, 27);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(1370, 27);
@@ -226,6 +232,18 @@
             this.printToolStripButton.Size = new System.Drawing.Size(23, 24);
             this.printToolStripButton.Text = "Print";
             this.printToolStripButton.Click += new System.EventHandler(this.printToolStripButton_Click);
+            // 
+            // webcamToolStripButton
+            // 
+            this.webcamToolStripButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.webcamToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.webcamToolStripButton.Enabled = false;
+            this.webcamToolStripButton.Image = global::IDCardManagement.Properties.Resources.slr_camera;
+            this.webcamToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.webcamToolStripButton.Name = "webcamToolStripButton";
+            this.webcamToolStripButton.Size = new System.Drawing.Size(23, 24);
+            this.webcamToolStripButton.Text = "Capture Image";
+            this.webcamToolStripButton.Click += new System.EventHandler(this.toolStripButton3_Click);
             // 
             // openFileDialog1
             // 
@@ -417,6 +435,11 @@
             // 
             this.printDialog1.UseEXDialog = true;
             // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 27);
+            // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -499,6 +522,8 @@
         private System.Drawing.Printing.PrintDocument printDocument1;
         private System.Windows.Forms.PrintPreviewDialog printPreviewDialog1;
         private System.Windows.Forms.PrintDialog printDialog1;
+        private System.Windows.Forms.ToolStripButton webcamToolStripButton;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
 
     }
 }

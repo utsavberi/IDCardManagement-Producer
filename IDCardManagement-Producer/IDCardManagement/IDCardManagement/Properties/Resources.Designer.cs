@@ -81,6 +81,13 @@ namespace IDCardManagement.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap camera {
+            get {
+                object obj = ResourceManager.GetObject("camera", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap delete {
             get {
                 object obj = ResourceManager.GetObject("delete", resourceCulture);
@@ -126,6 +133,13 @@ namespace IDCardManagement.Properties {
         internal static System.Drawing.Bitmap shop {
             get {
                 object obj = ResourceManager.GetObject("shop", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap slr_camera {
+            get {
+                object obj = ResourceManager.GetObject("slr_camera", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
