@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlServerCe;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -38,7 +39,11 @@ namespace IDCardManagement
 
         private void Form2_Load(object o, EventArgs e)
         {
-            toolStripStatusLabel1.Text = "Click on Open or New to start working...";
+            // TODO: This line of code loads data into the 'applicantDataSet.Applicants' table. You can move, or remove it, as needed.
+            //this.applicantsTableAdapter.Fill(this.applicantDataSet.Applicants);
+            // TODO: This line of code loads data into the 'applicantDataSet.Applicants' table. You can move, or remove it, as needed.
+
+            toolStripStatusLabel1.Text = "Click on Open to start working...";
             foreach (FontFamily font in System.Drawing.FontFamily.Families)
             {
                 fontToolStripComboBox.Items.Add(font.Name);
@@ -47,32 +52,65 @@ namespace IDCardManagement
 
         }
 
+        private void loadDataGrid(String str)
+        {
+            using (SqlCeConnection c = new SqlCeConnection(
+        str))
+            {
+                Console.WriteLine("here" + str);
+                c.Open();
+                using (SqlCeDataAdapter a = new SqlCeDataAdapter(
+                    "SELECT * FROM " + idcard.tableName, c))
+                {
+                    DataTable t = new DataTable();
+                    a.Fill(t);
+                    dataGridView1.DataSource = t;
+                }
+            }
+        }
+
         private void Form2_LoadFile(object sender, EventArgs e)
         {
             if (idcard.backgroundImage != null) panel1.BackgroundImage = idcard.backgroundImage;
             else { panel1.BackgroundImage = null; }
-            toolStripStatusLabel1.Text = "Right Click to add Fields...";
+            toolStripStatusLabel1.Text = "Select Records on the right to fill form..";//"Right Click to add Fields...";
             label1.Text = idcard.title;
             label1.MouseDown += tmplbl_MouseDown;
             ControlMover.Init(label1);
-            //ControlMover.Init(panel1);
-            if (pictureBox1 != null)
-                ControlMover.Init(pictureBox1);
+            if (pictureBox1 != null) ControlMover.Init(pictureBox1);
             panel1.Visible = true;
+            loadDataGrid(idcard.connectionString);
 
+            printToolStripButton.Enabled = true;
             panel1.Size = new Size(idcard.dimensions.Width * 10, idcard.dimensions.Height * 10);
-            //panel1.Left = ((Width - panel1.Width) / 2)-80;
-            panel1.Top = (Height - panel1.Height) / 2;
+            panel1.Left = ((this.Width - panel1.Width - dataGridView1.Width) / 2) - 20;
+            panel1.Top = (this.Height - panel1.Height) / 2;
             rectangleShape1.Visible = true;
             rectangleShape1.Width = panel1.Width;
             rectangleShape1.Height = panel1.Height;
             rectangleShape1.Left = panel1.Left + 5;
             rectangleShape1.Top = panel1.Top + 5;
-            contextMenuStrip1.Items.Clear();
-            foreach (String str in idcard.selectedFields)
+            //contextMenuStrip1.Items.Clear();
+            //foreach (String str in idcard.selectedFields)
+            //{
+            //    ToolStripItem tmp = contextMenuStrip1.Items.Add(str);
+            //    tmp.Click += tmpToolStripItem_Click;
+            //}
+
+
+            foreach (Control ctl in panel1.Controls)
             {
-                ToolStripItem tmp = contextMenuStrip1.Items.Add(str);
-                tmp.Click += tmpToolStripItem_Click;
+                if (ctl is Label)
+                {
+                    Label tmp = new Label();
+                    tmp.Tag = ctl.Text;
+                    tmp.Left = ctl.Left + ctl.Width + 10;
+                    tmp.BackColor = Color.Beige;
+                    tmp.Top = ctl.Top;
+                    ControlMover.Init(tmp);
+                    tmp.MouseDown += tmplbl_MouseDown;
+                    panel1.Controls.Add(tmp);
+                }
             }
 
         }
@@ -123,7 +161,6 @@ namespace IDCardManagement
                                     panel1.Controls.Add(pictureBox1);
                                     pictureBox1.BackgroundImage = global::IDCardManagement.Properties.Resources.avatar;
                                     pictureBox1.BackgroundImageLayout = ImageLayout.Stretch;
-                                    //Console.WriteLine("alice blue");
                                     pictureBox1.Left = Convert.ToInt32(reader.GetAttribute("left"));
                                     pictureBox1.Top = Convert.ToInt32(reader.GetAttribute("top"));
                                     pictureBox1.Height = Convert.ToInt32(reader.GetAttribute("height"));
@@ -136,8 +173,7 @@ namespace IDCardManagement
                                     String base64String;
                                     if ((base64String = reader.GetAttribute("backgroundImage")) != null)
                                     {
-                                        // Console.WriteLine(base64String);
-                                        byte[] imageBytes = Convert.FromBase64String(base64String);
+                                                                                byte[] imageBytes = Convert.FromBase64String(base64String);
                                         MemoryStream ms = new MemoryStream(imageBytes, 0, imageBytes.Length);
                                         // Convert byte[] to Image
                                         ms.Write(imageBytes, 0, imageBytes.Length);
@@ -146,15 +182,13 @@ namespace IDCardManagement
                                     }
                                     title = reader.GetAttribute("title");
                                     tableName = reader.GetAttribute("tableName");
+                                    connectionString = reader.GetAttribute("connectionString");
                                     break;
                                 case "field":
                                     fields.Add(reader.ReadString());
-                                    //Console.WriteLine("fields:"+reader.ReadString());
-                                    //Console.WriteLine("name: " + " value :" + reader.Value);
                                     break;
                                 case "selectedField":
-                                    //Console.WriteLine("selectedfields:"+reader.ReadString());
-                                    selectedFields.Add(reader.ReadString());
+                                     selectedFields.Add(reader.ReadString());
                                     break;
 
                             }
@@ -274,8 +308,7 @@ namespace IDCardManagement
                 {
                     if (((Label)ctl).BorderStyle == BorderStyle.FixedSingle)
                         panel1.Controls.Remove(ctl);
-                    // ctl.Dispose();
-                    //((Label)ctl).BackColor = colorDialog1.Color;
+                   
                 }
             }
 
@@ -367,7 +400,7 @@ namespace IDCardManagement
         //new
         private void newToolStripButton_Click(object sender, EventArgs e)
         {
-           // Form1 frm = new Form1(this);
+            // Form1 frm = new Form1(this);
             //Hide();
             //frm.Show();
         }
@@ -392,6 +425,52 @@ namespace IDCardManagement
 
         }
 
+
+        private void dataGridView1_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            DataGridViewCellCollection dcc = dataGridView1.SelectedRows[0].Cells;
+            //foreach()
+            foreach (DataGridViewCell dc in dcc)
+                foreach (Control ctl in panel1.Controls)
+                    if (ctl.Tag != null) if (dc.OwningColumn.HeaderCell.Value.ToString() == (ctl as Label).Tag.ToString()) (ctl as Label).Text = (dc.Value.ToString() + "     ");
+            //if (ctl.Tag != null) Console.WriteLine(ctl.Tag.ToString());
+        }
+
+        //Printing..
+        Bitmap MemoryImage;
+        private void printDocument1_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e)
+        {
+            Rectangle pagearea = e.PageBounds;
+            //e.Graphics.DrawImage(MemoryImage, (pagearea.Width / 2) - (panel1.Width / 2), panel1.Location.Y);
+            e.Graphics.DrawImage(MemoryImage, 0, 0);
+
+        }
+        
+        public void GetPrintArea(Panel pnl)
+        {
+            MemoryImage = new Bitmap(pnl.Width, pnl.Height);
+            Rectangle rect = new Rectangle(0, 0, pnl.Width, pnl.Height);
+            pnl.DrawToBitmap(MemoryImage, new Rectangle(0, 0, pnl.Width, pnl.Height));
+        }
+        //protected override void OnPaint(PaintEventArgs e)
+        //{
+        //    e.Graphics.DrawImage(MemoryImage, 0, 0);
+        //    base.OnPaint(e);
+        //}
+        
+
+        public void Print()
+        {
+            
+            GetPrintArea(panel1);
+            printDialog1.Document = printDocument1;
+            if(printDialog1.ShowDialog()==DialogResult.OK)printDocument1.Print();
+        }
+
+        private void printToolStripButton_Click(object sender, EventArgs e)
+        {
+            Print();
+        }
 
     }
 }
