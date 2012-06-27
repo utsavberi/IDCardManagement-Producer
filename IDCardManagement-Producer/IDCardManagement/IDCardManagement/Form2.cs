@@ -21,8 +21,9 @@ namespace IDCardManagement
         public int X { get; set; }
         private IDCard idcard;
         PictureBox pictureBox1;
-        Panel panel1;
-        Label label1;
+        Panel panel1, panel2;
+        bool mouseClicked;
+
 
         public Form2()
         {
@@ -78,10 +79,15 @@ namespace IDCardManagement
             label1.Text = idcard.title;
             label1.MouseDown += tmplbl_MouseDown;
             ControlMover.Init(label1);
-            if (pictureBox1 != null) ControlMover.Init(pictureBox1);
+            if (pictureBox1 != null) //ControlMover.Init(pictureBox1);
             panel1.Visible = true;
             loadDataGrid(idcard.connectionString);
-
+           
+            
+           
+           
+            
+            
             printToolStripButton.Enabled = true;
             webcamToolStripButton.Enabled = true;
             saveToolStripButton.Enabled = true;
@@ -99,26 +105,33 @@ namespace IDCardManagement
             //    ToolStripItem tmp = contextMenuStrip1.Items.Add(str);
             //    tmp.Click += tmpToolStripItem_Click;
             //}
-
+            label1.Tag = "notext";
 
             foreach (Control ctl in panel1.Controls)
             {
-                if (ctl is Label)
+                if (ctl is Label)//(string)ctl.Tag !="notext")
                 {
-                    Label tmp = new Label();
-                    tmp.Tag = ctl.Text;
-                    tmp.Left = ctl.Left + ctl.Width + 10;
-                    tmp.BackColor = Color.Beige;
-                    tmp.Top = ctl.Top;
-                    ControlMover.Init(tmp);
-                    tmp.MouseDown += tmplbl_MouseDown;
-                    panel1.Controls.Add(tmp);
+                    //if ((string)ctl.Tag != "notext")
+                    {
+                        Label tmp = new Label();
+                        tmp.Tag = ctl.Text;
+                        tmp.Left = ctl.Left + ctl.Width + 10;
+                        tmp.BackColor = Color.Beige;
+                        tmp.Top = ctl.Top;
+                        tmp.MouseDown += tmplbl_MouseDown;
+                        ControlMover.Init(tmp);
+                        panel1.Controls.Add(tmp);
+                        // MessageBox.Show("name:"+ctl.Name+" tag :"+ctl.Tag);
+                    }
+                    //else { MessageBox.Show("found him"); }
                 }
             }
 
         }
 
         //open
+        PictureBox ptmp;
+        Panel panel4;
         private void openToolStripButton_Click(object sender, EventArgs e)
         {
 
@@ -161,13 +174,45 @@ namespace IDCardManagement
                                 case "pictureBox":
 
                                     pictureBox1 = new PictureBox();
-                                    panel1.Controls.Add(pictureBox1);
-                                    pictureBox1.BackgroundImage = global::IDCardManagement.Properties.Resources.avatar;
-                                    pictureBox1.BackgroundImageLayout = ImageLayout.Stretch;
-                                    pictureBox1.Left = Convert.ToInt32(reader.GetAttribute("left"));
-                                    pictureBox1.Top = Convert.ToInt32(reader.GetAttribute("top"));
-                                    pictureBox1.Height = Convert.ToInt32(reader.GetAttribute("height"));
-                                    pictureBox1.Width = Convert.ToInt32(reader.GetAttribute("width"));
+                                   panel4 = new Panel(); pictureBox1.Left = 0;
+                                    pictureBox1.Top = 0;
+                                    pictureBox1.Dock = DockStyle.Fill;
+                                    //panel1.Controls.Add(pictureBox1); 
+                                  // pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((( System.Windows.Forms.AnchorStyles.Bottom))| System.Windows.Forms.AnchorStyles.Right)));
+                                    //panel4.Controls.Add(pictureBox1);
+                                    panel4.BackgroundImage=global::IDCardManagement.Properties.Resources.avatar;
+                                    panel4.BackgroundImageLayout = ImageLayout.Stretch;
+                                   // pictureBox1.BackgroundImage = global::IDCardManagement.Properties.Resources.avatar;
+                                    //pictureBox1.Image =global::IDCardManagement.Properties.Resources.avatar;
+                                    //pictureBox1.BackgroundImageLayout = ImageLayout.Stretch;
+                                    //pictureBox1.Left = Convert.ToInt32(reader.GetAttribute("left"));
+                                    //pictureBox1.Top = Convert.ToInt32(reader.GetAttribute("top"));
+                                    //pictureBox1.Height = Convert.ToInt32(reader.GetAttribute("height"));
+                                    //pictureBox1.Width = Convert.ToInt32(reader.GetAttribute("width"));
+                                    panel4.Left = Convert.ToInt32(reader.GetAttribute("left"));
+                                    panel4.Top = Convert.ToInt32(reader.GetAttribute("top"));
+                                    panel4.Height = Convert.ToInt32(reader.GetAttribute("height"));
+                                    panel4.Width = Convert.ToInt32(reader.GetAttribute("width"));
+                                    panel1.Controls.Add(panel4);
+                                    ptmp = new PictureBox();
+                                    ptmp.Cursor = Cursors.SizeNWSE;
+                                    ptmp.BackColor = Color.Transparent;
+                                    //ptmp.BackgroundImage  = global::IDCardManagement.Properties.Resources.avatar;
+                                    ptmp.BackgroundImageLayout=ImageLayout.Stretch;
+                                    ptmp.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Bottom)) | System.Windows.Forms.AnchorStyles.Right)));
+                                    ptmp.Height = 20;
+                                    ptmp.Width = 20;
+                                    ptmp.Left =panel4.Width - 20;
+                                    ptmp.Top = panel4.Height - 20;
+                                    panel4.Controls.Add(ptmp);
+                                    ptmp.MouseDown += ptmp_MouseDown;
+                                    ptmp.MouseUp += ptmp_MouseUp;
+                                    ptmp.MouseMove += ptmp_MouseMove;
+                                   // pictureBox1.MouseDown+=pictureBox2_MouseDown;
+                                    //pictureBox1.MouseDown+=pictureBox2_MouseDown;
+                                    //pictureBox1.MouseMove+=pictureBox2_MouseMove;
+                                    ControlMover.Init(panel4);
+                                    //ControlMover.Init(pictureBox1);
                                     break;
 
                                 case "idCard":
@@ -176,7 +221,7 @@ namespace IDCardManagement
                                     String base64String;
                                     if ((base64String = reader.GetAttribute("backgroundImage")) != null)
                                     {
-                                                                                byte[] imageBytes = Convert.FromBase64String(base64String);
+                                        byte[] imageBytes = Convert.FromBase64String(base64String);
                                         MemoryStream ms = new MemoryStream(imageBytes, 0, imageBytes.Length);
                                         // Convert byte[] to Image
                                         ms.Write(imageBytes, 0, imageBytes.Length);
@@ -192,7 +237,7 @@ namespace IDCardManagement
                                     fields.Add(reader.ReadString());
                                     break;
                                 case "selectedField":
-                                     selectedFields.Add(reader.ReadString());
+                                    selectedFields.Add(reader.ReadString());
                                     break;
 
                             }
@@ -204,6 +249,25 @@ namespace IDCardManagement
 
                 Form2_LoadFile(null, null);
             }
+        }
+
+        void ptmp_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (mouseClicked)
+            {
+                this.panel4.Height = ptmp.Top + e.Y;
+                this.panel4.Width = ptmp.Left + e.X;
+            }
+        }
+
+        void ptmp_MouseUp(object sender, MouseEventArgs e)
+        {
+            mouseClicked = false;
+        }
+
+        void ptmp_MouseDown(object sender, MouseEventArgs e)
+        {
+            mouseClicked = true;
         }
 
         private void tmpToolStripItem_Click(object sender, EventArgs e)
@@ -312,7 +376,7 @@ namespace IDCardManagement
                 {
                     if (((Label)ctl).BorderStyle == BorderStyle.FixedSingle)
                         panel1.Controls.Remove(ctl);
-                   
+
                 }
             }
 
@@ -510,7 +574,7 @@ namespace IDCardManagement
             e.Graphics.DrawImage(MemoryImage, 0, 0);
 
         }
-        
+
         public void GetPrintArea(Panel pnl)
         {
             MemoryImage = new Bitmap(pnl.Width, pnl.Height);
@@ -522,14 +586,14 @@ namespace IDCardManagement
         //    e.Graphics.DrawImage(MemoryImage, 0, 0);
         //    base.OnPaint(e);
         //}
-        
+
 
         public void Print()
         {
-            
+
             GetPrintArea(panel1);
             printDialog1.Document = printDocument1;
-            if(printDialog1.ShowDialog()==DialogResult.OK)printDocument1.Print();
+            if (printDialog1.ShowDialog() == DialogResult.OK) printDocument1.Print();
         }
 
         private void printToolStripButton_Click(object sender, EventArgs e)
@@ -541,23 +605,24 @@ namespace IDCardManagement
         int webcamStatus;
         private void toolStripButton3_Click(object sender, EventArgs e)
         {
-            if (pictureBox1 != null && webcamStatus == 0)
+            if (panel4 != null && webcamStatus == 0)
             {
                 webcam = new WebCam();
-                webcam.InitializeWebCam(ref pictureBox1);
+                webcam.InitializeWebCam(ref panel4);
                 webcam.Start();
                 webcamStatus = 1;
                 toolStripStatusLabel1.Text = "Click on 'Capture Image' button again to capture image";
 
             }
-            else 
+            else
             {
                 webcam.Stop(); webcamStatus = 0;
-                
+
             }
         }
 
-        
+
+
 
     }
 }
