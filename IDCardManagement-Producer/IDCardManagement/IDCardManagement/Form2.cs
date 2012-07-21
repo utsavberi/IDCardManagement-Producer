@@ -23,6 +23,7 @@ namespace IDCardManagement
         PictureBox pictureBox1;
         Panel panel1;
         bool mouseClicked;
+        string extraTableName;
 
 
         public Form2()
@@ -204,6 +205,7 @@ namespace IDCardManagement
                                         connectionString = reader.GetAttribute("connectionString");
                                         dataSourceType = reader.GetAttribute("dataSourceType");
                                         primaryKey = reader.GetAttribute("primaryKey");
+                                        extraTableName = reader.GetAttribute("extraTableName");
                                         break;
                                     case "field":
                                         fields.Add(reader.ReadString());
@@ -559,36 +561,31 @@ namespace IDCardManagement
             
             //string timestamp = DateTime.Now.ToString();
             //string prevtimestamp="null";
-           
-            //using (SqlCeConnection con = new SqlCeConnection(idcard.connectionString))
-            //{
-            //    string tmp = "if not exists (select * from sysobjects where name='" + idcard.tableName + "extra' and xtype='U')";
-            //    con.Open();
-            //    try{
-            //        using (SqlCeCommand cmd = new SqlCeCommand("  create table " + idcard.tableName + "extra ( pic1 varbinary(8000) )", con))
-            //    {
-            //        cmd.ExecuteNonQuery();
-            //    }}
-            //    catch(SqlCeException ex)
-            //    {
-            //        Console.WriteLine("myerror :"+ex.Message);
-            //    }
-            //    try
-            //    {
-            //        using (SqlCeCommand cmd = new SqlCeCommand("Insert into " + idcard.tableName + "extra (pic1) Values (@Pic)", con))
-            //        {
 
-            //            cmd.Parameters.Add("Pic", SqlDbType.Image, 0).Value =
-            //                ConvertImageToByteArray(pictureBox1.BackgroundImage, System.Drawing.Imaging.ImageFormat.Jpeg);
-            //            cmd.ExecuteNonQuery();
+            using (SqlCeConnection con = new SqlCeConnection(idcard.connectionString))
+            {
+                try
+                {
+                    con.Open();
+                    using (SqlCeCommand cmd = new SqlCeCommand("Insert into " + extraTableName + "  Values (@id,@Pic,@printtime,@machineid,@log,@oldprinttime)", con))
+                    {
 
-            //        }
-            //    }
-            //    catch (SqlCeException ex)
-            //    {
-            //        Console.WriteLine("myerror2 :" + ex.Message);
-            //    }
+                        cmd.Parameters.Add("Pic", SqlDbType.Image, 0).Value = ConvertImageToByteArray(pictureContainerPanel.BackgroundImage, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        cmd.Parameters.Add("id", SqlDbType.NVarChar).Value = "";
+                        cmd.Parameters.Add("printtime", SqlDbType.NVarChar).Value = DateTime.Now.ToString();
+                        cmd.Parameters.Add("machineid", SqlDbType.NVarChar).Value = Environment.MachineName;
+                        cmd.Parameters.Add("log", SqlDbType.NVarChar).Value = "";
+                        cmd.Parameters.Add("oldprinttime", SqlDbType.NVarChar).Value = "";
+                        cmd.ExecuteNonQuery();
 
+                    }
+                }
+            
+                catch (SqlCeException ex)
+                {
+                    Console.WriteLine("myerror2 :" + ex.Message);
+                }
+        }
                     
 
 
@@ -609,7 +606,7 @@ namespace IDCardManagement
             }
             else
             {
-                webcam.Stop(); webcamStatus = 0;
+                webcam.Stop(); webcam.Continue(); webcamStatus = 0;
 
             }
         }
