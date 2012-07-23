@@ -32,6 +32,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form2));
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.newToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -47,7 +48,7 @@
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.printToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.webcamToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator109 = new System.Windows.Forms.ToolStripSeparator();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
@@ -73,6 +74,9 @@
             this.printDocument1 = new System.Drawing.Printing.PrintDocument();
             this.printPreviewDialog1 = new System.Windows.Forms.PrintPreviewDialog();
             this.printDialog1 = new System.Windows.Forms.PrintDialog();
+            this.rightPanel = new System.Windows.Forms.Panel();
+            this.queryTxt = new System.Windows.Forms.TextBox();
+            this.selectFieldComboBox = new System.Windows.Forms.ComboBox();
             this.toolStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -80,6 +84,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.applicantDataSetBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.applicantsBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            this.rightPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // contextMenuStrip1
@@ -105,7 +110,7 @@
             this.toolStripSeparator2,
             this.printToolStripButton,
             this.webcamToolStripButton,
-            this.toolStripSeparator4});
+            this.toolStripSeparator109});
             this.toolStrip1.Location = new System.Drawing.Point(0, 27);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(1370, 27);
@@ -243,10 +248,10 @@
             this.webcamToolStripButton.Text = "Capture Image";
             this.webcamToolStripButton.Click += new System.EventHandler(this.toolStripButton3_Click);
             // 
-            // toolStripSeparator4
+            // toolStripSeparator109
             // 
-            this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 27);
+            this.toolStripSeparator109.Name = "toolStripSeparator109";
+            this.toolStripSeparator109.Size = new System.Drawing.Size(6, 27);
             // 
             // openFileDialog1
             // 
@@ -259,7 +264,6 @@
             // 
             // panel1
             // 
-            this.panel1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("panel1.BackgroundImage")));
             this.panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.panel1.Controls.Add(this.titleLbl);
             this.panel1.Location = new System.Drawing.Point(12, 162);
@@ -269,13 +273,13 @@
             this.panel1.Visible = false;
             this.panel1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseUp);
             // 
-            // label1
+            // titleLbl
             // 
             this.titleLbl.AutoSize = true;
             this.titleLbl.BackColor = System.Drawing.Color.Transparent;
             this.titleLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.titleLbl.Location = new System.Drawing.Point(187, 13);
-            this.titleLbl.Name = "label1";
+            this.titleLbl.Name = "titleLbl";
             this.titleLbl.Size = new System.Drawing.Size(0, 31);
             this.titleLbl.TabIndex = 2;
             this.titleLbl.Tag = "notext";
@@ -402,13 +406,21 @@
             // 
             // dataGridView1
             // 
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.Black;
+            this.dataGridView1.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataGridView1.BackgroundColor = System.Drawing.Color.Silver;
+            this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.dataGridView1.Location = new System.Drawing.Point(1130, 54);
+            this.dataGridView1.Location = new System.Drawing.Point(0, 53);
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(240, 661);
+            this.dataGridView1.Size = new System.Drawing.Size(216, 605);
             this.dataGridView1.TabIndex = 5;
             this.dataGridView1.RowHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_RowHeaderMouseClick);
+            this.dataGridView1.Validating += new System.ComponentModel.CancelEventHandler(this.dataGridView1_Validating);
             // 
             // printDocument1
             // 
@@ -428,6 +440,46 @@
             // 
             this.printDialog1.UseEXDialog = true;
             // 
+            // rightPanel
+            // 
+            this.rightPanel.BackColor = System.Drawing.Color.Silver;
+            this.rightPanel.Controls.Add(this.queryTxt);
+            this.rightPanel.Controls.Add(this.selectFieldComboBox);
+            this.rightPanel.Controls.Add(this.dataGridView1);
+            this.rightPanel.Dock = System.Windows.Forms.DockStyle.Right;
+            this.rightPanel.Location = new System.Drawing.Point(1156, 54);
+            this.rightPanel.Name = "rightPanel";
+            this.rightPanel.Size = new System.Drawing.Size(214, 661);
+            this.rightPanel.TabIndex = 6;
+            // 
+            // queryTxt
+            // 
+            this.queryTxt.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(81)))), ((int)(((byte)(81)))), ((int)(((byte)(81)))));
+            this.queryTxt.Enabled = false;
+            this.queryTxt.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.333333F);
+            this.queryTxt.ForeColor = System.Drawing.Color.White;
+            this.queryTxt.Location = new System.Drawing.Point(4, 24);
+            this.queryTxt.Name = "queryTxt";
+            this.queryTxt.Size = new System.Drawing.Size(208, 23);
+            this.queryTxt.TabIndex = 7;
+            this.queryTxt.Text = "Enter query...";
+            this.queryTxt.Click += new System.EventHandler(this.queryTxt_Click);
+            this.queryTxt.TextChanged += new System.EventHandler(this.queryTxt_TextChanged);
+            // 
+            // selectFieldComboBox
+            // 
+            this.selectFieldComboBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(81)))), ((int)(((byte)(81)))), ((int)(((byte)(81)))));
+            this.selectFieldComboBox.Enabled = false;
+            this.selectFieldComboBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.333333F);
+            this.selectFieldComboBox.ForeColor = System.Drawing.Color.White;
+            this.selectFieldComboBox.FormattingEnabled = true;
+            this.selectFieldComboBox.Location = new System.Drawing.Point(3, 2);
+            this.selectFieldComboBox.Name = "selectFieldComboBox";
+            this.selectFieldComboBox.Size = new System.Drawing.Size(208, 25);
+            this.selectFieldComboBox.TabIndex = 6;
+            this.selectFieldComboBox.Text = "Select Field...";
+            this.selectFieldComboBox.SelectedIndexChanged += new System.EventHandler(this.selectFieldComboBox_SelectedIndexChanged);
+            // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -438,12 +490,13 @@
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(1370, 737);
             this.ContextMenuStrip = this.contextMenuStrip1;
-            this.Controls.Add(this.dataGridView1);
+            this.Controls.Add(this.rightPanel);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.shapeContainer1);
+            this.DoubleBuffered = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form2";
@@ -462,6 +515,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.applicantDataSetBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.applicantsBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            this.rightPanel.ResumeLayout(false);
+            this.rightPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -472,25 +527,14 @@
         private System.Windows.Forms.Label titleLbl;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStrip toolStrip1;
-        private System.Windows.Forms.ToolStripComboBox fontToolStripComboBox;
-        private System.Windows.Forms.ToolStripComboBox fontSizeToolStripComboBox;
-        private System.Windows.Forms.ToolStripButton toolStripButton1;
         private System.Windows.Forms.ColorDialog colorDialog1;
-        private System.Windows.Forms.ToolStripButton toolStripButton2;
-        private System.Windows.Forms.ToolStripButton deleteToolStripButton;
-        private System.Windows.Forms.ToolStripButton saveToolStripButton;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
-        private System.Windows.Forms.ToolStripButton openToolStripButton;
-        private System.Windows.Forms.ToolStripButton newToolStripButton;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem formatToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem fontToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
@@ -505,12 +549,26 @@
         private System.Windows.Forms.BindingSource applicantsBindingSource;
        // private ApplicantDataSetTableAdapters.ApplicantsTableAdapter applicantsTableAdapter;
         private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.ToolStripButton printToolStripButton;
         private System.Drawing.Printing.PrintDocument printDocument1;
         private System.Windows.Forms.PrintPreviewDialog printPreviewDialog1;
         private System.Windows.Forms.PrintDialog printDialog1;
+        private System.Windows.Forms.ToolStripButton newToolStripButton;
+        private System.Windows.Forms.ToolStripButton openToolStripButton;
+        private System.Windows.Forms.ToolStripButton saveToolStripButton;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripButton deleteToolStripButton;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripComboBox fontToolStripComboBox;
+        private System.Windows.Forms.ToolStripComboBox fontSizeToolStripComboBox;
+        private System.Windows.Forms.ToolStripButton toolStripButton1;
+        private System.Windows.Forms.ToolStripButton toolStripButton2;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripButton printToolStripButton;
         private System.Windows.Forms.ToolStripButton webcamToolStripButton;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator109;
+        private System.Windows.Forms.Panel rightPanel;
+        private System.Windows.Forms.TextBox queryTxt;
+        private System.Windows.Forms.ComboBox selectFieldComboBox;
 
     }
 }
