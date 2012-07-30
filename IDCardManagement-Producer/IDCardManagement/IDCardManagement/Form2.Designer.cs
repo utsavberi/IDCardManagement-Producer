@@ -32,7 +32,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form2));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.newToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -49,6 +49,7 @@
             this.printToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.webcamToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator109 = new System.Windows.Forms.ToolStripSeparator();
+            this.reportsToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
@@ -110,7 +111,8 @@
             this.toolStripSeparator2,
             this.printToolStripButton,
             this.webcamToolStripButton,
-            this.toolStripSeparator109});
+            this.toolStripSeparator109,
+            this.reportsToolStripButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 27);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(1370, 27);
@@ -252,6 +254,17 @@
             // 
             this.toolStripSeparator109.Name = "toolStripSeparator109";
             this.toolStripSeparator109.Size = new System.Drawing.Size(6, 27);
+            // 
+            // reportsToolStripButton
+            // 
+            this.reportsToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.reportsToolStripButton.Enabled = false;
+            this.reportsToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("reportsToolStripButton.Image")));
+            this.reportsToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.reportsToolStripButton.Name = "reportsToolStripButton";
+            this.reportsToolStripButton.Size = new System.Drawing.Size(23, 24);
+            this.reportsToolStripButton.Text = "Reports";
+            this.reportsToolStripButton.Click += new System.EventHandler(this.toolStripButton3_Click_1);
             // 
             // openFileDialog1
             // 
@@ -406,9 +419,9 @@
             // 
             // dataGridView1
             // 
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.Black;
-            this.dataGridView1.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.Black;
+            this.dataGridView1.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -569,6 +582,7 @@
         private System.Windows.Forms.Panel rightPanel;
         private System.Windows.Forms.TextBox queryTxt;
         private System.Windows.Forms.ComboBox selectFieldComboBox;
+        private System.Windows.Forms.ToolStripButton reportsToolStripButton;
 
     }
 }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Data.SqlServerCe;
 using System.Drawing;
 using System.IO;
@@ -31,6 +32,19 @@ namespace IDCardManagement
             webcamStatus = 0;
         }
 
+        //called when double-click on .idc file
+        public Form2(string fileopen)
+        {
+            InitializeComponent();
+         
+            if (fileopen != null)
+            {
+                filename = fileopen;
+                openLoadFile();
+            }
+        }
+
+        //called when "file->new" 
         public Form2(IDCard idcard)
         {
             this.DoubleBuffered = true;
@@ -66,39 +80,75 @@ namespace IDCardManagement
 
         }
 
-        SqlCeDataAdapter sqlAdapter;
+        SqlCeDataAdapter sqlCeAdapter;
+        SqlDataAdapter sqlAdapter;
         DataTable dTable;
         BindingSource bSource;
         private void loadDataGrid(String str)
         {
-            try
+            switch (idcard.dataSourceType)
             {
-                SqlCeConnection c = new SqlCeConnection(str);
-                {
-                    c.Open();
-                    sqlAdapter = new SqlCeDataAdapter("SELECT * FROM " + idcard.tableName, c);
+                case "Microsoft SQL Server Compact 3.5":
+                    try
                     {
-                        dTable = new DataTable();
-                        sqlAdapter.Fill(dTable);
-                        SqlCeCommandBuilder sqlCommand = new SqlCeCommandBuilder(sqlAdapter);
-                        sqlAdapter.InsertCommand = sqlCommand.GetInsertCommand();
-                        sqlAdapter.UpdateCommand = sqlCommand.GetUpdateCommand();
-                        sqlAdapter.DeleteCommand = sqlCommand.GetDeleteCommand();
-                        sqlAdapter.InsertCommand.Connection = c;
+                        SqlCeConnection c = new SqlCeConnection(str);
+                        {
+                            c.Open();
+                            sqlCeAdapter = new SqlCeDataAdapter("SELECT * FROM " + idcard.tableName, c);
+                            {
+                                dTable = new DataTable();
+                                sqlCeAdapter.Fill(dTable);
+                                SqlCeCommandBuilder sqlCommand = new SqlCeCommandBuilder(sqlCeAdapter);
+                                sqlCeAdapter.InsertCommand = sqlCommand.GetInsertCommand();
+                                sqlCeAdapter.UpdateCommand = sqlCommand.GetUpdateCommand();
+                                sqlCeAdapter.DeleteCommand = sqlCommand.GetDeleteCommand();
+                                sqlCeAdapter.InsertCommand.Connection = c;
 
-                        //sqlAdapter.InsertCommand = new SqlCeCommand("insert into "+idcard.tableName+" values ");
-                        bSource = new BindingSource();
-                        bSource.DataSource = dTable;
-                        dataGridView1.DataSource = bSource;
-                        //dataGridView1.DataSource = t;
+                                //sqlAdapter.InsertCommand = new SqlCeCommand("insert into "+idcard.tableName+" values ");
+                                bSource = new BindingSource();
+                                bSource.DataSource = dTable;
+                                dataGridView1.DataSource = bSource;
+                                //dataGridView1.DataSource = t;
+                            }
+                        }
                     }
-                }
+                    catch (Exception ex) { MessageBox.Show("Invalid file format :" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+                    break;
+                case "Microsoft SQL Server":
+                    try
+                    {
+                        SqlConnection c = new SqlConnection(str);
+                        {
+                            c.Open();
+                            sqlAdapter = new SqlDataAdapter("SELECT * FROM " + idcard.tableName, c);
+                            {
+                                dTable = new DataTable();
+                                sqlAdapter.Fill(dTable);
+                                SqlCommandBuilder sqlCommand = new SqlCommandBuilder(sqlAdapter);
+                                sqlAdapter.InsertCommand = sqlCommand.GetInsertCommand();
+                                sqlAdapter.UpdateCommand = sqlCommand.GetUpdateCommand();
+                                sqlAdapter.DeleteCommand = sqlCommand.GetDeleteCommand();
+                                sqlAdapter.InsertCommand.Connection = c;
+
+                                //sqlAdapter.InsertCommand = new SqlCeCommand("insert into "+idcard.tableName+" values ");
+                                bSource = new BindingSource();
+                                bSource.DataSource = dTable;
+                                dataGridView1.DataSource = bSource;
+                                //dataGridView1.DataSource = t;
+                            }
+                        }
+                    }
+                    catch (Exception ex) { MessageBox.Show("Invalid file format :" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+                    break;
             }
-            catch (Exception ex) { MessageBox.Show("Invalid file format :" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+
+
         }
 
         private void Form2_LoadFile()
         {
+            webcamStatus = 0;
+            webcamstarted = 0;
             selectFieldComboBox.DataSource = idcard.fields;
             SetDoubleBuffered(panel1);
             if (idcard.backgroundImage != null) panel1.BackgroundImage = idcard.backgroundImage;
@@ -153,6 +203,7 @@ namespace IDCardManagement
             webcamToolStripButton.Enabled = true;
             saveToolStripButton.Enabled = true;
             selectFieldComboBox.Enabled = true;
+            reportsToolStripButton.Enabled = true;
         }
 
         //open
@@ -162,92 +213,98 @@ namespace IDCardManagement
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 filename = openFileDialog1.FileName;
-                this.Text = filename + " - IDCard Producer";
-
-                ArrayList fields = new ArrayList();
-                ArrayList selectedFields = new ArrayList();
-
-                Image backgroundImage = null;
-                string connectionString = "", tableName = "", title = "", dataSourceType = "", primaryKey = "";
-
-                Size dimensions = new Size();
-
-                panel1.Controls.Clear();
-                panel1.ContextMenuStrip = contextMenuStrip1;
-
-                try
-                {
-                    using (XmlTextReader reader = new XmlTextReader(openFileDialog1.FileName))
-                        while (reader.Read())
-                        {
-                            if (reader.NodeType == XmlNodeType.Element)
-                            {
-                                #region
-                                switch (reader.Name)
-                                {
-                                    case "label":
-                                        Label tmp = new Label();
-                                        tmp.Text = reader.GetAttribute("text");
-                                        tmp.Top = Convert.ToInt32(reader.GetAttribute("top"));
-                                        tmp.Left = Convert.ToInt32(reader.GetAttribute("left"));
-                                        panel1.Controls.Add(tmp);
-                                        tmp.MouseDown += tmplbl_MouseDown;
-                                        ControlMover.Init(tmp);
-                                        tmp.AutoSize = true;
-                                        tmp.Font = (Font)TypeDescriptor.GetConverter(typeof(Font)).ConvertFromString(reader.GetAttribute("font"));
-                                        tmp.BackColor = Color.FromArgb(Convert.ToInt32(reader.GetAttribute("backcolor")));
-                                        tmp.ForeColor = Color.FromArgb(Convert.ToInt32(reader.GetAttribute("forecolor")));
-                                        break;
-                                    case "IDpictureBox":
-                                        pictureContainerPanel = new Panel();
-                                        pictureContainerPanel.Tag = "IDpictureBox";
-                                        pictureContainerPanel.BackgroundImage = global::IDCardManagement.Properties.Resources.avatar;
-                                        pictureContainerPanel.BackgroundImageLayout = ImageLayout.Stretch;
-                                        pictureContainerPanel.Left = Convert.ToInt32(reader.GetAttribute("left"));
-                                        pictureContainerPanel.Top = Convert.ToInt32(reader.GetAttribute("top"));
-                                        pictureContainerPanel.Height = Convert.ToInt32(reader.GetAttribute("height"));
-                                        pictureContainerPanel.Width = Convert.ToInt32(reader.GetAttribute("width"));
-                                        panel1.Controls.Add(pictureContainerPanel);
-                                        break;
-
-                                    case "idCard":
-                                        dimensions.Height = Convert.ToInt32(reader.GetAttribute("height"));
-                                        dimensions.Width = Convert.ToInt32(reader.GetAttribute("width"));
-                                        String base64String;
-                                        if ((base64String = reader.GetAttribute("backgroundImage")) != null)
-                                        {
-                                            byte[] imageBytes = Convert.FromBase64String(base64String);
-                                            MemoryStream ms = new MemoryStream(imageBytes, 0, imageBytes.Length);
-                                            // Convert byte[] to Image
-                                            ms.Write(imageBytes, 0, imageBytes.Length);
-                                            backgroundImage = Image.FromStream(ms, true);
-
-
-                                        }
-                                        title = reader.GetAttribute("title");
-                                        tableName = reader.GetAttribute("tableName");
-                                        connectionString = reader.GetAttribute("connectionString");
-                                        dataSourceType = reader.GetAttribute("dataSourceType");
-                                        primaryKey = reader.GetAttribute("primaryKey");
-                                        extraTableName = reader.GetAttribute("extraTableName");
-                                        break;
-                                    case "field":
-                                        fields.Add(reader.ReadString());
-                                        break;
-                                    case "selectedField":
-                                        selectedFields.Add(reader.ReadString());
-                                        break;
-
-                                }
-
-                                #endregion
-                            }
-                        }
-                    idcard = new IDCard(connectionString, dataSourceType, tableName, primaryKey, dimensions, backgroundImage, fields, selectedFields, title);
-                    Form2_LoadFile();
-                }
-                catch (Exception ex) { MessageBox.Show("Invalid file format", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+                openLoadFile();
             }
+        }
+
+        void openLoadFile()
+        {
+            this.Text = filename + " - IDCard Producer";
+
+            ArrayList fields = new ArrayList();
+            ArrayList selectedFields = new ArrayList();
+
+            Image backgroundImage = null;
+            string connectionString = "", tableName = "", title = "", dataSourceType = "", primaryKey = "";
+
+            Size dimensions = new Size();
+
+            panel1.Controls.Clear();
+            panel1.ContextMenuStrip = contextMenuStrip1;
+
+            try
+            {
+                using (XmlTextReader reader = new XmlTextReader(filename))
+                    while (reader.Read())
+                    {
+                        if (reader.NodeType == XmlNodeType.Element)
+                        {
+                            #region
+                            switch (reader.Name)
+                            {
+                                case "label":
+                                    Label tmp = new Label();
+                                    tmp.Text = reader.GetAttribute("text");
+                                    tmp.Top = Convert.ToInt32(reader.GetAttribute("top"));
+                                    tmp.Left = Convert.ToInt32(reader.GetAttribute("left"));
+                                    panel1.Controls.Add(tmp);
+                                    tmp.MouseDown += tmplbl_MouseDown;
+                                    ControlMover.Init(tmp);
+                                    tmp.AutoSize = true;
+                                    tmp.Font = (Font)TypeDescriptor.GetConverter(typeof(Font)).ConvertFromString(reader.GetAttribute("font"));
+                                    tmp.BackColor = Color.FromArgb(Convert.ToInt32(reader.GetAttribute("backcolor")));
+                                    tmp.ForeColor = Color.FromArgb(Convert.ToInt32(reader.GetAttribute("forecolor")));
+                                    break;
+                                case "IDpictureBox":
+                                    pictureContainerPanel = new Panel();
+                                    pictureContainerPanel.Tag = "IDpictureBox";
+                                    pictureContainerPanel.BackgroundImage = global::IDCardManagement.Properties.Resources.avatar;
+                                    pictureContainerPanel.BackgroundImageLayout = ImageLayout.Stretch;
+                                    pictureContainerPanel.Left = Convert.ToInt32(reader.GetAttribute("left"));
+                                    pictureContainerPanel.Top = Convert.ToInt32(reader.GetAttribute("top"));
+                                    pictureContainerPanel.Height = Convert.ToInt32(reader.GetAttribute("height"));
+                                    pictureContainerPanel.Width = Convert.ToInt32(reader.GetAttribute("width"));
+                                    panel1.Controls.Add(pictureContainerPanel);
+                                    break;
+
+                                case "idCard":
+                                    dimensions.Height = Convert.ToInt32(reader.GetAttribute("height"));
+                                    dimensions.Width = Convert.ToInt32(reader.GetAttribute("width"));
+                                    String base64String;
+                                    if ((base64String = reader.GetAttribute("backgroundImage")) != null)
+                                    {
+                                        byte[] imageBytes = Convert.FromBase64String(base64String);
+                                        MemoryStream ms = new MemoryStream(imageBytes, 0, imageBytes.Length);
+                                        // Convert byte[] to Image
+                                        ms.Write(imageBytes, 0, imageBytes.Length);
+                                        backgroundImage = Image.FromStream(ms, true);
+
+
+                                    }
+                                    title = reader.GetAttribute("title");
+                                    tableName = reader.GetAttribute("tableName");
+                                    connectionString = reader.GetAttribute("connectionString");
+                                    dataSourceType = reader.GetAttribute("dataSourceType");
+                                    primaryKey = reader.GetAttribute("primaryKey");
+                                    extraTableName = reader.GetAttribute("extraTableName");
+                                    break;
+                                case "field":
+                                    fields.Add(reader.ReadString());
+                                    break;
+                                case "selectedField":
+                                    selectedFields.Add(reader.ReadString());
+                                    break;
+
+                            }
+
+                            #endregion
+                        }
+                    }
+                idcard = new IDCard(connectionString, dataSourceType, tableName, primaryKey, dimensions, backgroundImage, fields, selectedFields, title);
+                Form2_LoadFile();
+            }
+            catch (Exception ex) { MessageBox.Show("Invalid file format" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+
         }
 
         private void tmpToolStripItem_Click(object sender, EventArgs e)
@@ -565,96 +622,174 @@ namespace IDCardManagement
         //    base.OnPaint(e);
         //}
 
-        public void Print()
+        public Boolean Print()
         {
 
             GetPrintArea(panel1);
             printDialog1.Document = printDocument1;
-            if (printDialog1.ShowDialog() == DialogResult.OK) printDocument1.Print();
+            if (printDialog1.ShowDialog() == DialogResult.OK) { printDocument1.Print(); return true; }
+            else return false;
         }
 
         private void printToolStripButton_Click(object sender, EventArgs e)
         {
-            Print();
-            int i = getIndexOf(idcard.primaryKey, dataGridView1);
-            string id = dataGridView1.SelectedRows[0].Cells[i].Value.ToString();
-            string log = "";
-            string oldprinttime = "";                 
-           
-
-            string cnstr="";
-            using (SqlCeConnection con = new SqlCeConnection(idcard.connectionString))
+            if (Print() == true)
             {
-                try
+                int i = getIndexOf(idcard.primaryKey, dataGridView1);
+                string id = dataGridView1.SelectedRows[0].Cells[i].Value.ToString();
+                string log = "";
+                string oldprinttime = "";
+
+
+                string cnstr = "";
+                switch (idcard.dataSourceType)
                 {
-                    con.Open();          
-                    cnstr="select * from " + extraTableName + " where " + idcard.primaryKey + " = '" + id+"'";
-                    using (SqlCeCommand cmd1 = new SqlCeCommand(cnstr,con))
-                    {           
-
-                        SqlCeDataReader rdr = cmd1.ExecuteReader();            
-                        
-                       
-
-                        if (rdr.Read() == false)
+                    case "Microsoft SQL Server Compact 3.5":
+                        using (SqlCeConnection con = new SqlCeConnection(idcard.connectionString))
                         {
-                            
-                            using (SqlCeCommand cmd2 = new SqlCeCommand("Insert into " + extraTableName + "  Values (@id,@printtime,@machineid,@log,@oldprinttime)", con))
+                            try
                             {
+                                con.Open();
+                                cnstr = "select * from " + extraTableName + " where " + idcard.primaryKey + " = '" + id + "'";
+                                using (SqlCeCommand cmd1 = new SqlCeCommand(cnstr, con))
+                                {
 
-                                //cmd2.Parameters.Add("Pic", SqlDbType.Image, 0).Value = ConvertImageToByteArray(pictureContainerPanel.BackgroundImage, System.Drawing.Imaging.ImageFormat.Jpeg);
-                                cmd2.Parameters.Add("id", SqlDbType.NVarChar).Value = id;
-                                cmd2.Parameters.Add("printtime", SqlDbType.NVarChar).Value = DateTime.Now.ToString();
-                                cmd2.Parameters.Add("machineid", SqlDbType.NVarChar).Value = Environment.MachineName;
-                                cmd2.Parameters.Add("log", SqlDbType.NVarChar).Value = "";
-                                cmd2.Parameters.Add("oldprinttime", SqlDbType.NVarChar).Value = "";
-                                cmd2.ExecuteNonQuery();
+                                    SqlCeDataReader rdr = cmd1.ExecuteReader();
 
+
+
+                                    if (rdr.Read() == false)
+                                    {
+
+                                        using (SqlCeCommand cmd2 = new SqlCeCommand("Insert into " + extraTableName + "  Values (@id,@printtime,@machineid,@log,@oldprinttime)", con))
+                                        {
+
+                                            //cmd2.Parameters.Add("Pic", SqlDbType.Image, 0).Value = ConvertImageToByteArray(pictureContainerPanel.BackgroundImage, System.Drawing.Imaging.ImageFormat.Jpeg);
+                                            cmd2.Parameters.Add("id", SqlDbType.NVarChar).Value = id;
+                                            cmd2.Parameters.Add("printtime", SqlDbType.NVarChar).Value = DateTime.Now.ToString();
+                                            cmd2.Parameters.Add("machineid", SqlDbType.NVarChar).Value = Environment.MachineName + " : " + Environment.UserDomainName + " : " + Environment.UserName;
+                                            cmd2.Parameters.Add("log", SqlDbType.NVarChar).Value = "";
+                                            cmd2.Parameters.Add("oldprinttime", SqlDbType.NVarChar).Value = "";
+                                            cmd2.ExecuteNonQuery();
+
+                                        }
+                                        using (SqlCeCommand cmd2 = new SqlCeCommand("Insert into " + extraTableName + "pic  Values (@id,@Pic)", con))
+                                        {
+
+                                            cmd2.Parameters.Add("Pic", SqlDbType.Image, 0).Value = ConvertImageToByteArray(pictureContainerPanel.BackgroundImage, System.Drawing.Imaging.ImageFormat.Jpeg);
+                                            cmd2.Parameters.Add("id", SqlDbType.NVarChar).Value = id;
+                                            //cmd2.Parameters.Add("printtime", SqlDbType.NVarChar).Value = DateTime.Now.ToString();
+                                            //cmd2.Parameters.Add("machineid", SqlDbType.NVarChar).Value = Environment.MachineName;
+                                            //cmd2.Parameters.Add("log", SqlDbType.NVarChar).Value = "";
+                                            //cmd2.Parameters.Add("oldprinttime", SqlDbType.NVarChar).Value = "";
+                                            cmd2.ExecuteNonQuery();
+
+                                        }
+                                    }
+                                    else
+                                    {
+                                        oldprinttime = rdr["printtime"].ToString();
+                                        InputBox ib = new InputBox();
+                                        if (ib.ShowDialog() == DialogResult.OK)
+                                            log = ib.value;
+                                        //InputBox.show("Enter reason for re-print..");
+                                        //log = InputBox.value;
+                                        cnstr = "update " + extraTableName + "  set printtime = '" + DateTime.Now.ToString() + "' , log = '" + log + "' ,  oldprinttime = '" + oldprinttime + "' where id = '" + id + "'";
+                                        using (SqlCeCommand cmd3 = new SqlCeCommand(cnstr, con))
+                                        {
+                                            cmd3.ExecuteNonQuery();
+                                        }
+
+
+                                    }
+
+                                }
+                                con.Close();
                             }
-                            using (SqlCeCommand cmd2 = new SqlCeCommand("Insert into " + extraTableName + "pic  Values (@id,@Pic)", con))
+
+                            catch (SqlCeException ex)
                             {
-
-                                cmd2.Parameters.Add("Pic", SqlDbType.Image, 0).Value = ConvertImageToByteArray(pictureContainerPanel.BackgroundImage, System.Drawing.Imaging.ImageFormat.Jpeg);
-                                cmd2.Parameters.Add("id", SqlDbType.NVarChar).Value = id;
-                                //cmd2.Parameters.Add("printtime", SqlDbType.NVarChar).Value = DateTime.Now.ToString();
-                                //cmd2.Parameters.Add("machineid", SqlDbType.NVarChar).Value = Environment.MachineName;
-                                //cmd2.Parameters.Add("log", SqlDbType.NVarChar).Value = "";
-                                //cmd2.Parameters.Add("oldprinttime", SqlDbType.NVarChar).Value = "";
-                                cmd2.ExecuteNonQuery();
-
+                                MessageBox.Show("myerror2 :" + ex.Message + "   " + cnstr);
+                                Console.WriteLine("myerror2 :" + ex.Message + "   " + cnstr);
                             }
+
                         }
-                        else
+                        break;
+                    case "Microsoft SQL Server":
+                        using (SqlConnection con = new SqlConnection(idcard.connectionString))
                         {
-                            oldprinttime =  rdr["printtime"].ToString();
-                            InputBox ib = new InputBox();
-                            if (ib.ShowDialog() == DialogResult.OK)
-                                log = ib.value  ;
-                            //InputBox.show("Enter reason for re-print..");
-                            //log = InputBox.value;
-                            cnstr = "update " + extraTableName + "  set printtime = '" + DateTime.Now.ToString() + "' , log = '" + log + "' ,  oldprinttime = '" + oldprinttime + "' where id = '" + id + "'";
-                            using (SqlCeCommand cmd3 = new SqlCeCommand(cnstr, con))
+                            try
                             {
-                                cmd3.ExecuteNonQuery();
+                                con.Open();
+                                cnstr = "select * from " + extraTableName + " where " + idcard.primaryKey + " = '" + id + "'";
+                                using (SqlCommand cmd1 = new SqlCommand(cnstr, con))
+                                {
+
+                                    SqlDataReader rdr = cmd1.ExecuteReader();
+
+
+
+                                    if (rdr.Read() == false)
+                                    {
+
+                                        using (SqlCommand cmd2 = new SqlCommand("Insert into " + extraTableName + "  Values (@id,@printtime,@machineid,@log,@oldprinttime)", con))
+                                        {
+
+                                            //cmd2.Parameters.Add("Pic", SqlDbType.Image, 0).Value = ConvertImageToByteArray(pictureContainerPanel.BackgroundImage, System.Drawing.Imaging.ImageFormat.Jpeg);
+                                            cmd2.Parameters.Add("id", SqlDbType.NVarChar).Value = id;
+                                            cmd2.Parameters.Add("printtime", SqlDbType.NVarChar).Value = DateTime.Now.ToString();
+                                            cmd2.Parameters.Add("machineid", SqlDbType.NVarChar).Value = Environment.MachineName + " : " + Environment.UserDomainName + " : " + Environment.UserName;
+                                            cmd2.Parameters.Add("log", SqlDbType.NVarChar).Value = "";
+                                            cmd2.Parameters.Add("oldprinttime", SqlDbType.NVarChar).Value = "";
+                                            cmd2.ExecuteNonQuery();
+
+                                        }
+                                        using (SqlCommand cmd2 = new SqlCommand("Insert into " + extraTableName + "pic  Values (@id,@Pic)", con))
+                                        {
+
+                                            cmd2.Parameters.Add("Pic", SqlDbType.Image, 0).Value = ConvertImageToByteArray(pictureContainerPanel.BackgroundImage, System.Drawing.Imaging.ImageFormat.Jpeg);
+                                            cmd2.Parameters.Add("id", SqlDbType.NVarChar).Value = id;
+                                            //cmd2.Parameters.Add("printtime", SqlDbType.NVarChar).Value = DateTime.Now.ToString();
+                                            //cmd2.Parameters.Add("machineid", SqlDbType.NVarChar).Value = Environment.MachineName;
+                                            //cmd2.Parameters.Add("log", SqlDbType.NVarChar).Value = "";
+                                            //cmd2.Parameters.Add("oldprinttime", SqlDbType.NVarChar).Value = "";
+                                            cmd2.ExecuteNonQuery();
+
+                                        }
+                                    }
+                                    else
+                                    {
+                                        oldprinttime = rdr["printtime"].ToString();
+                                        InputBox ib = new InputBox();
+                                        if (ib.ShowDialog() == DialogResult.OK)
+                                            log = ib.value;
+                                        //InputBox.show("Enter reason for re-print..");
+                                        //log = InputBox.value;
+                                        cnstr = "update " + extraTableName + "  set printtime = '" + DateTime.Now.ToString() + "' , log = '" + log + "' ,  oldprinttime = '" + oldprinttime + "' where id = '" + id + "'";
+                                        using (SqlCommand cmd3 = new SqlCommand(cnstr, con))
+                                        {
+                                            cmd3.ExecuteNonQuery();
+                                        }
+
+
+                                    }
+
+                                }
+                                con.Close();
                             }
 
+                            catch (SqlException ex)
+                            {
+                                MessageBox.Show("myerror2 :" + ex.Message + "   " + cnstr);
+                                Console.WriteLine("myerror2 :" + ex.Message + "   " + cnstr);
+                            }
 
                         }
-                       
-                    }
-                    con.Close();
+                        break;
                 }
 
-                catch (SqlCeException ex)
-                {
-                   MessageBox.Show("myerror2 :" + ex.Message +"   "+ cnstr);
-                   Console.WriteLine("myerror2 :" + ex.Message + "   " + cnstr);
-                }
 
             }
-
-
-
         }
 
         private int getIndexOf(string columnName, DataGridView dataGridView)
@@ -670,31 +805,32 @@ namespace IDCardManagement
 
         WebCam webcam;
         int webcamStatus;
-        int webcamstarted = 0;
+        int webcamstarted;
         private void toolStripButton3_Click(object sender, EventArgs e)
         {
-            if (pictureContainerPanel != null && webcamStatus == 0)
-            {
-                if (webcamstarted == 0)
+            if (pictureContainerPanel != null)
+                if (webcamStatus == 0)
                 {
-                    webcam = new WebCam();
-                    webcam.InitializeWebCam(ref pictureContainerPanel);
-                    webcam.Start();
-                    webcamstarted = 1;
+                    if (webcamstarted == 0)
+                    {
+                        webcam = new WebCam();
+                        webcam.InitializeWebCam(ref pictureContainerPanel);
+                        webcam.Start();
+                        webcamstarted = 1;
+                    }
+                    else if (webcamstarted == 1)
+                    {
+                        webcam.Continue();
+                    }
+                    webcamStatus = 1;
+                    toolStripStatusLabel1.Text = "Click on 'Capture Image' button again to capture image";
+
                 }
-                else if (webcamstarted == 1)
+                else
                 {
-                    webcam.Continue();
+                    webcam.Stop(); webcamStatus = 0;
+
                 }
-                webcamStatus = 1;
-                toolStripStatusLabel1.Text = "Click on 'Capture Image' button again to capture image";
-
-            }
-            else
-            {
-                webcam.Stop(); webcamStatus = 0;
-
-            }
         }
 
         private void selectFieldComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -721,7 +857,15 @@ namespace IDCardManagement
         {
             try
             {
-                sqlAdapter.Update(dTable);
+                switch (idcard.dataSourceType)
+                {
+                    case "Microsoft SQL Server Compact 3.5":
+                        sqlCeAdapter.Update(dTable);
+                        break;
+                    case "Microsoft SQL Server":
+                        sqlAdapter.Update(dTable);
+                        break;
+                }
             }
             catch (Exception x) { }
         }
@@ -732,6 +876,12 @@ namespace IDCardManagement
                 queryTxt.SelectAll();
 
 
+        }
+
+        private void toolStripButton3_Click_1(object sender, EventArgs e)
+        {
+            Form1 frm= new Form1(idcard,extraTableName);
+            frm.Show();
         }
 
 
