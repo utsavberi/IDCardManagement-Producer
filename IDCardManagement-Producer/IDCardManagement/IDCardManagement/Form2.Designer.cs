@@ -32,7 +32,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form2));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.newToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -78,6 +78,7 @@
             this.rightPanel = new System.Windows.Forms.Panel();
             this.queryTxt = new System.Windows.Forms.TextBox();
             this.selectFieldComboBox = new System.Windows.Forms.ComboBox();
+            this.picFromFiletoolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -111,6 +112,7 @@
             this.toolStripSeparator2,
             this.printToolStripButton,
             this.webcamToolStripButton,
+            this.picFromFiletoolStripButton,
             this.toolStripSeparator109,
             this.reportsToolStripButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 27);
@@ -277,6 +279,7 @@
             // 
             // panel1
             // 
+            this.panel1.BackColor = System.Drawing.Color.White;
             this.panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.panel1.Controls.Add(this.titleLbl);
             this.panel1.Location = new System.Drawing.Point(12, 162);
@@ -419,9 +422,9 @@
             // 
             // dataGridView1
             // 
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.Black;
-            this.dataGridView1.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.Black;
+            this.dataGridView1.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -493,6 +496,17 @@
             this.selectFieldComboBox.Text = "Select Field...";
             this.selectFieldComboBox.SelectedIndexChanged += new System.EventHandler(this.selectFieldComboBox_SelectedIndexChanged);
             // 
+            // picFromFiletoolStripButton
+            // 
+            this.picFromFiletoolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.picFromFiletoolStripButton.Enabled = false;
+            this.picFromFiletoolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("picFromFiletoolStripButton.Image")));
+            this.picFromFiletoolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.picFromFiletoolStripButton.Name = "picFromFiletoolStripButton";
+            this.picFromFiletoolStripButton.Size = new System.Drawing.Size(23, 24);
+            this.picFromFiletoolStripButton.Text = "Choose Picture from File..";
+            this.picFromFiletoolStripButton.Click += new System.EventHandler(this.picFromFiletoolStripButton_Click);
+            // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -515,6 +529,7 @@
             this.Name = "Form2";
             this.Text = "IDCard Producer";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form2_FormClosed);
             this.Load += new System.EventHandler(this.Form2_Load);
             this.Click += new System.EventHandler(this.Form2_Click);
             this.toolStrip1.ResumeLayout(false);
@@ -583,6 +598,7 @@
         private System.Windows.Forms.TextBox queryTxt;
         private System.Windows.Forms.ComboBox selectFieldComboBox;
         private System.Windows.Forms.ToolStripButton reportsToolStripButton;
+        private System.Windows.Forms.ToolStripButton picFromFiletoolStripButton;
 
     }
 }

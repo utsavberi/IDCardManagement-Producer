@@ -206,6 +206,7 @@ namespace IDCardManagement
             saveToolStripButton.Enabled = true;
             selectFieldComboBox.Enabled = true;
             reportsToolStripButton.Enabled = true;
+            picFromFiletoolStripButton.Enabled = true;
         }
 
         //open
@@ -671,7 +672,7 @@ namespace IDCardManagement
 
                                     if (rdr.Read() == false)
                                     {
-
+                                        rdr.Close();
                                         using (SqlCeCommand cmd2 = new SqlCeCommand("Insert into " + extraTableName + "  Values (@id,@printtime,@machineid,@log,@oldprinttime)", con))
                                         {
 
@@ -699,6 +700,7 @@ namespace IDCardManagement
                                     }
                                     else
                                     {
+                                        rdr.Close();
                                         oldprinttime = rdr["printtime"].ToString();
                                         InputBox ib = new InputBox();
                                         if (ib.ShowDialog() == DialogResult.OK)
@@ -732,8 +734,8 @@ namespace IDCardManagement
 
                             catch (SqlCeException ex)
                             {
-                                MessageBox.Show("myerror2 :" + ex.Message + "   " + cnstr);
-                                Console.WriteLine("myerror2 :" + ex.Message + "   " + cnstr);
+                                MessageBox.Show("myerror2 :" + ex.Message + "   " );
+                                Console.WriteLine("myerror2 :" + ex.Message + "   " );
                             }
 
                         }
@@ -754,7 +756,7 @@ namespace IDCardManagement
 
                                     if (rdr.Read() == false)
                                     {
-                                        rdr.Close(); cmd11.Dispose();
+                                        rdr.Close(); 
                                         using (SqlCommand cmd22 = new SqlCommand("Insert into " + extraTableName + "  Values (@id,@printtime,@machineid,@log,@oldprinttime)", con))
                                         {
 
@@ -767,22 +769,27 @@ namespace IDCardManagement
                                             cmd22.ExecuteNonQuery();
 
                                         }
-                                        using (SqlCommand cmd222 = new SqlCommand("Insert into " + extraTableName + "pic  Values (@id,@Pic)", con))
+                                        try
                                         {
+                                            using (SqlCommand cmd222 = new SqlCommand("Insert into " + extraTableName + "pic  Values (@id,@Pic)", con))
+                                            {
 
-                                            cmd222.Parameters.Add("Pic", SqlDbType.Image, 0).Value = ConvertImageToByteArray(pictureContainerPanel.BackgroundImage, System.Drawing.Imaging.ImageFormat.Jpeg);
-                                            cmd222.Parameters.Add("id", SqlDbType.NVarChar).Value = id;
-                                            //cmd2.Parameters.Add("printtime", SqlDbType.NVarChar).Value = DateTime.Now.ToString();
-                                            //cmd2.Parameters.Add("machineid", SqlDbType.NVarChar).Value = Environment.MachineName;
-                                            //cmd2.Parameters.Add("log", SqlDbType.NVarChar).Value = "";
-                                            //cmd2.Parameters.Add("oldprinttime", SqlDbType.NVarChar).Value = "";
-                                            cmd222.ExecuteNonQuery();
+                                                cmd222.Parameters.Add("Pic", SqlDbType.Image, 0).Value = ConvertImageToByteArray(pictureContainerPanel.BackgroundImage, System.Drawing.Imaging.ImageFormat.Jpeg);
+                                                cmd222.Parameters.Add("id", SqlDbType.NVarChar).Value = id;
+                                                //cmd2.Parameters.Add("printtime", SqlDbType.NVarChar).Value = DateTime.Now.ToString();
+                                                //cmd2.Parameters.Add("machineid", SqlDbType.NVarChar).Value = Environment.MachineName;
+                                                //cmd2.Parameters.Add("log", SqlDbType.NVarChar).Value = "";
+                                                //cmd2.Parameters.Add("oldprinttime", SqlDbType.NVarChar).Value = "";
+                                                cmd222.ExecuteNonQuery();
 
+                                            }
                                         }
+                                        catch (Exception ex) { Console.WriteLine(ex.Message+"  uttutut"); }
                                     }
                                     else
                                     {
-                                        oldprinttime = rdr["printtime"].ToString();
+                                        
+                                        oldprinttime = rdr["printtime"].ToString();rdr.Close();
                                         InputBox ib = new InputBox();
                                         if (ib.ShowDialog() == DialogResult.OK)
                                             log = ib.value;
@@ -814,8 +821,8 @@ namespace IDCardManagement
 
                             catch (SqlException ex)
                             {
-                                MessageBox.Show("myerror2 :" + ex.Message + "   " + cnstr);
-                                Console.WriteLine("myerror2 :" + ex.Message + "   " + cnstr);
+                                MessageBox.Show("myerror2 :" + ex.Message + "   ");
+                                Console.WriteLine("myerror2 :" + ex.Message + "   " );
                             }
 
                         }
@@ -916,6 +923,22 @@ namespace IDCardManagement
         {
             Form1 frm= new Form1(idcard,extraTableName);
             frm.Show();
+        }
+
+        private void Form2_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void picFromFiletoolStripButton_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog2 = new OpenFileDialog();
+            openFileDialog2.Filter = "Image files (*.jpg;*.jpeg;*.bmp;*.gif;*.gif)|*.jpg;*.jpeg;*.bmp;*.gif;*.gif|All files (*.*)|*.*";
+            if (openFileDialog2.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                //idcard.backgroundImage = new System.Drawing.Bitmap(openFileDialog2.FileName);
+                pictureContainerPanel.BackgroundImage = new System.Drawing.Bitmap(openFileDialog2.FileName);
+            }
         }
 
 

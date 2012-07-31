@@ -86,7 +86,7 @@ namespace IDCardManagement
 
 
                             }
-
+                            rdr.Close();
                             cmd = new SqlCeCommand("select count(*) from " + idcard.tableName, conn);
                             enrolledLabel.Text += cmd.ExecuteScalar().ToString();
 
@@ -155,6 +155,7 @@ namespace IDCardManagement
 
 
                             }
+                            rdr.Close();
 
                             cmd = new SqlCommand("select count(*) from " + idcard.tableName, conn);
                             enrolledLabel.Text += cmd.ExecuteScalar().ToString();
