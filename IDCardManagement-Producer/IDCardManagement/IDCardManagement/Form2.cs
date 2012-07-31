@@ -115,12 +115,14 @@ namespace IDCardManagement
                     catch (Exception ex) { MessageBox.Show("Invalid file format :" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
                     break;
                 case "Microsoft SQL Server":
+                    string cntu="";
                     try
                     {
                         SqlConnection c = new SqlConnection(str);
                         {
                             c.Open();
-                            sqlAdapter = new SqlDataAdapter("SELECT * FROM " + idcard.tableName, c);
+                             cntu = "SELECT * FROM " + idcard.tableName;
+                            sqlAdapter = new SqlDataAdapter(cntu, c);
                             {
                                 dTable = new DataTable();
                                 sqlAdapter.Fill(dTable);
@@ -138,7 +140,7 @@ namespace IDCardManagement
                             }
                         }
                     }
-                    catch (Exception ex) { MessageBox.Show("Invalid file format :" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+                    catch (Exception ex) { MessageBox.Show("Invalid file format : " + ex.Message +"    "+cntu, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
                     break;
             }
 
@@ -636,7 +638,16 @@ namespace IDCardManagement
             if (Print() == true)
             {
                 int i = getIndexOf(idcard.primaryKey, dataGridView1);
-                string id = dataGridView1.SelectedRows[0].Cells[i].Value.ToString();
+                string id = "";
+                try
+                {
+                     id = dataGridView1.SelectedRows[0].Cells[i].Value.ToString();
+                }
+                catch (Exception x)
+                {
+                    MessageBox.Show("Please select a record on the left before printing..!!");
+                    return;
+                }
                 string log = "";
                 string oldprinttime = "";
 
@@ -699,6 +710,18 @@ namespace IDCardManagement
                                         {
                                             cmd3.ExecuteNonQuery();
                                         }
+                                        using (SqlCeCommand cmd2 = new SqlCeCommand("update " + extraTableName + "pic set pic = @Pic where id = @id", con))
+                                        {
+
+                                            cmd2.Parameters.Add("Pic", SqlDbType.Image, 0).Value = ConvertImageToByteArray(pictureContainerPanel.BackgroundImage, System.Drawing.Imaging.ImageFormat.Jpeg);
+                                            cmd2.Parameters.Add("id", SqlDbType.NVarChar).Value = id;
+                                            //cmd2.Parameters.Add("printtime", SqlDbType.NVarChar).Value = DateTime.Now.ToString();
+                                            //cmd2.Parameters.Add("machineid", SqlDbType.NVarChar).Value = Environment.MachineName;
+                                            //cmd2.Parameters.Add("log", SqlDbType.NVarChar).Value = "";
+                                            //cmd2.Parameters.Add("oldprinttime", SqlDbType.NVarChar).Value = "";
+                                            cmd2.ExecuteNonQuery();
+
+                                        }
 
 
                                     }
@@ -722,38 +745,38 @@ namespace IDCardManagement
                             {
                                 con.Open();
                                 cnstr = "select * from " + extraTableName + " where " + idcard.primaryKey + " = '" + id + "'";
-                                using (SqlCommand cmd1 = new SqlCommand(cnstr, con))
+                                using (SqlCommand cmd11 = new SqlCommand(cnstr, con))
                                 {
 
-                                    SqlDataReader rdr = cmd1.ExecuteReader();
+                                    SqlDataReader rdr = cmd11.ExecuteReader();
 
 
 
                                     if (rdr.Read() == false)
                                     {
-
-                                        using (SqlCommand cmd2 = new SqlCommand("Insert into " + extraTableName + "  Values (@id,@printtime,@machineid,@log,@oldprinttime)", con))
+                                        rdr.Close(); cmd11.Dispose();
+                                        using (SqlCommand cmd22 = new SqlCommand("Insert into " + extraTableName + "  Values (@id,@printtime,@machineid,@log,@oldprinttime)", con))
                                         {
 
                                             //cmd2.Parameters.Add("Pic", SqlDbType.Image, 0).Value = ConvertImageToByteArray(pictureContainerPanel.BackgroundImage, System.Drawing.Imaging.ImageFormat.Jpeg);
-                                            cmd2.Parameters.Add("id", SqlDbType.NVarChar).Value = id;
-                                            cmd2.Parameters.Add("printtime", SqlDbType.NVarChar).Value = DateTime.Now.ToString();
-                                            cmd2.Parameters.Add("machineid", SqlDbType.NVarChar).Value = Environment.MachineName + " : " + Environment.UserDomainName + " : " + Environment.UserName;
-                                            cmd2.Parameters.Add("log", SqlDbType.NVarChar).Value = "";
-                                            cmd2.Parameters.Add("oldprinttime", SqlDbType.NVarChar).Value = "";
-                                            cmd2.ExecuteNonQuery();
+                                            cmd22.Parameters.Add("id", SqlDbType.NVarChar).Value = id;
+                                            cmd22.Parameters.Add("printtime", SqlDbType.NVarChar).Value = DateTime.Now.ToString();
+                                            cmd22.Parameters.Add("machineid", SqlDbType.NVarChar).Value = Environment.MachineName + " : " + Environment.UserDomainName + " : " + Environment.UserName;
+                                            cmd22.Parameters.Add("log", SqlDbType.NVarChar).Value = "";
+                                            cmd22.Parameters.Add("oldprinttime", SqlDbType.NVarChar).Value = "";
+                                            cmd22.ExecuteNonQuery();
 
                                         }
-                                        using (SqlCommand cmd2 = new SqlCommand("Insert into " + extraTableName + "pic  Values (@id,@Pic)", con))
+                                        using (SqlCommand cmd222 = new SqlCommand("Insert into " + extraTableName + "pic  Values (@id,@Pic)", con))
                                         {
 
-                                            cmd2.Parameters.Add("Pic", SqlDbType.Image, 0).Value = ConvertImageToByteArray(pictureContainerPanel.BackgroundImage, System.Drawing.Imaging.ImageFormat.Jpeg);
-                                            cmd2.Parameters.Add("id", SqlDbType.NVarChar).Value = id;
+                                            cmd222.Parameters.Add("Pic", SqlDbType.Image, 0).Value = ConvertImageToByteArray(pictureContainerPanel.BackgroundImage, System.Drawing.Imaging.ImageFormat.Jpeg);
+                                            cmd222.Parameters.Add("id", SqlDbType.NVarChar).Value = id;
                                             //cmd2.Parameters.Add("printtime", SqlDbType.NVarChar).Value = DateTime.Now.ToString();
                                             //cmd2.Parameters.Add("machineid", SqlDbType.NVarChar).Value = Environment.MachineName;
                                             //cmd2.Parameters.Add("log", SqlDbType.NVarChar).Value = "";
                                             //cmd2.Parameters.Add("oldprinttime", SqlDbType.NVarChar).Value = "";
-                                            cmd2.ExecuteNonQuery();
+                                            cmd222.ExecuteNonQuery();
 
                                         }
                                     }
@@ -766,11 +789,22 @@ namespace IDCardManagement
                                         //InputBox.show("Enter reason for re-print..");
                                         //log = InputBox.value;
                                         cnstr = "update " + extraTableName + "  set printtime = '" + DateTime.Now.ToString() + "' , log = '" + log + "' ,  oldprinttime = '" + oldprinttime + "' where id = '" + id + "'";
-                                        using (SqlCommand cmd3 = new SqlCommand(cnstr, con))
+                                        using (SqlCommand cmd32 = new SqlCommand(cnstr, con))
                                         {
-                                            cmd3.ExecuteNonQuery();
+                                            cmd32.ExecuteNonQuery();
                                         }
+                                        using (SqlCommand cmd21 = new SqlCommand("update " + extraTableName + "pic set pic = @Pic where id = @id", con))
+                                        {
 
+                                            cmd21.Parameters.Add("Pic", SqlDbType.Image, 0).Value = ConvertImageToByteArray(pictureContainerPanel.BackgroundImage, System.Drawing.Imaging.ImageFormat.Jpeg);
+                                            cmd21.Parameters.Add("id", SqlDbType.NVarChar).Value = id;
+                                            //cmd21.Parameters.Add("printtime", SqlDbType.NVarChar).Value = DateTime.Now.ToString();
+                                            //cmd21.Parameters.Add("machineid", SqlDbType.NVarChar).Value = Environment.MachineName;
+                                            //cmd21.Parameters.Add("log", SqlDbType.NVarChar).Value = "";
+                                            //cmd21.Parameters.Add("oldprinttime", SqlDbType.NVarChar).Value = "";
+                                            cmd21.ExecuteNonQuery();
+
+                                        }
 
                                     }
 
