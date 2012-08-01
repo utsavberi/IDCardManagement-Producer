@@ -95,6 +95,13 @@ namespace IDCardManagement.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap fire_icon {
+            get {
+                object obj = ResourceManager.GetObject("fire-icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap folder {
             get {
                 object obj = ResourceManager.GetObject("folder", resourceCulture);
