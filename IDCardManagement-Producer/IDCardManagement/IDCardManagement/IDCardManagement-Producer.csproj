@@ -26,7 +26,7 @@
     <ProductName>IDCardProducer</ProductName>
     <PublisherName>Utsav Beri</PublisherName>
     <SuiteName>IDCardManagement</SuiteName>
-    <ApplicationRevision>8</ApplicationRevision>
+    <ApplicationRevision>11</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -67,10 +67,6 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.SqlServerCe.Client, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Desktop\ConnectionDialog\References\Microsoft.SqlServerCe.Client.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Microsoft.VisualBasic.PowerPacks.Vs, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="PdfSharp">
@@ -78,7 +74,6 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -93,11 +88,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApplicantDataSet.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>ApplicantDataSet.xsd</DependentUpon>
-    </Compile>
     <Compile Include="ControlMover.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -140,17 +130,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="ApplicantDataSet.xsc">
-      <DependentUpon>ApplicantDataSet.xsd</DependentUpon>
-    </None>
-    <None Include="ApplicantDataSet.xsd">
-      <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>ApplicantDataSet.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ApplicantDataSet.xss">
-      <DependentUpon>ApplicantDataSet.xsd</DependentUpon>
-    </None>
     <None Include="IDCardManagement-Producer_TemporaryKey.pfx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -230,9 +209,6 @@
     <None Include="Resources\slr_camera.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Applicant.sdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="fire.ico" />
     <Content Include="leaf.ico" />
   </ItemGroup>
@@ -243,6 +219,28 @@
       <Progid>1</Progid>
       <DefaultIcon>leaf.ico</DefaultIcon>
     </FileAssociation>
+  </ItemGroup>
+  <ItemGroup>
+    <PublishFile Include="Microsoft.SqlServerCe.Client">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Assembly</FileType>
+    </PublishFile>
+    <PublishFile Include="Microsoft.VisualBasic.PowerPacks.Vs">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Assembly</FileType>
+    </PublishFile>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

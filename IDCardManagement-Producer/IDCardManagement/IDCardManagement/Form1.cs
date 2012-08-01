@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Data.SqlServerCe;
+//using System.Data.SqlServerCe;
 using System.IO;
 using PdfSharp.Pdf;
 using PdfSharp.Drawing;
@@ -31,75 +31,75 @@ namespace IDCardManagement
         {
             switch (idcard.dataSourceType)
             {
-                case "Microsoft SQL Server Compact 3.5":
-                    try
-                    {
-                        using (SqlCeConnection conn = new SqlCeConnection(idcard.connectionString))
-                        {
-                            conn.Open();
-                            SqlCeCommand cmd = new SqlCeCommand("select * from " + extraTableName + "pic, " + extraTableName + ", " + idcard.tableName + " where " + extraTableName + ".id = " + extraTableName + "pic.id AND " + extraTableName + ".id = " + idcard.tableName + "." + idcard.primaryKey, conn);
-                            SqlCeDataReader rdr = cmd.ExecuteReader();
-                            int i = 0;
-                            while (rdr.Read())
-                            {
-                                Byte[] byteBLOBData = new Byte[0];
-                                byteBLOBData = (Byte[])(rdr["pic"]);
-                                MemoryStream stmBLOBData = new MemoryStream(byteBLOBData);
-                                PictureBox picBx = new PictureBox();
-                                picBx.BackgroundImage = Image.FromStream(stmBLOBData);
-                                picBx.BackgroundImageLayout = ImageLayout.Stretch;
-                                picBx.Top = (i * 100) + 30;
-                                picBx.Height = 100;
-                                picBx.Width = 100;
-                                groupBox1.Controls.Add(picBx);
+                //case "Microsoft SQL Server Compact 3.5":
+                //    try
+                //    {
+                //        using (SqlCeConnection conn = new SqlCeConnection(idcard.connectionString))
+                //        {
+                //            conn.Open();
+                //            SqlCeCommand cmd = new SqlCeCommand("select * from " + extraTableName + "pic, " + extraTableName + ", " + idcard.tableName + " where " + extraTableName + ".id = " + extraTableName + "pic.id AND " + extraTableName + ".id = " + idcard.tableName + "." + idcard.primaryKey, conn);
+                //            SqlCeDataReader rdr = cmd.ExecuteReader();
+                //            int i = 0;
+                //            while (rdr.Read())
+                //            {
+                //                Byte[] byteBLOBData = new Byte[0];
+                //                byteBLOBData = (Byte[])(rdr["pic"]);
+                //                MemoryStream stmBLOBData = new MemoryStream(byteBLOBData);
+                //                PictureBox picBx = new PictureBox();
+                //                picBx.BackgroundImage = Image.FromStream(stmBLOBData);
+                //                picBx.BackgroundImageLayout = ImageLayout.Stretch;
+                //                picBx.Top = (i * 100) + 30;
+                //                picBx.Height = 100;
+                //                picBx.Width = 100;
+                //                groupBox1.Controls.Add(picBx);
 
-                                Label tmp1 = new Label();
-                                tmp1.Text = rdr["name"].ToString();
-                                tmp1.Top = (i * 100) + 40;
-                                tmp1.Left = 120;
-                                tmp1.Width = 500;
-                                groupBox1.Controls.Add(tmp1);
+                //                Label tmp1 = new Label();
+                //                tmp1.Text = rdr["name"].ToString();
+                //                tmp1.Top = (i * 100) + 40;
+                //                tmp1.Left = 120;
+                //                tmp1.Width = 500;
+                //                groupBox1.Controls.Add(tmp1);
 
-                                tmp1 = new Label();
-                                tmp1.Text = rdr["printtime"].ToString();
-                                tmp1.Top = (i * 100) + 60;
-                                tmp1.Left = 120;
-                                tmp1.Width = 500;
-                                groupBox1.Controls.Add(tmp1);
+                //                tmp1 = new Label();
+                //                tmp1.Text = rdr["printtime"].ToString();
+                //                tmp1.Top = (i * 100) + 60;
+                //                tmp1.Left = 120;
+                //                tmp1.Width = 500;
+                //                groupBox1.Controls.Add(tmp1);
 
-                                Label tmp2 = new Label();
-                                tmp2.Text = rdr["machineid"].ToString();
-                                tmp2.Top = (i * 100) + 80;
-                                tmp2.Left = 120;
-                                tmp2.Width = 500;
-                                groupBox1.Controls.Add(tmp2);
+                //                Label tmp2 = new Label();
+                //                tmp2.Text = rdr["machineid"].ToString();
+                //                tmp2.Top = (i * 100) + 80;
+                //                tmp2.Left = 120;
+                //                tmp2.Width = 500;
+                //                groupBox1.Controls.Add(tmp2);
 
-                                tmp1 = new Label();
-                                tmp1.Text = rdr["log"].ToString();
-                                tmp1.Top = (i * 100) + 100;
-                                tmp1.Left = 120;
-                                tmp1.Width = 500;
-                                groupBox1.Controls.Add(tmp1);
-
-
-                                i++;
+                //                tmp1 = new Label();
+                //                tmp1.Text = rdr["log"].ToString();
+                //                tmp1.Top = (i * 100) + 100;
+                //                tmp1.Left = 120;
+                //                tmp1.Width = 500;
+                //                groupBox1.Controls.Add(tmp1);
 
 
-                            }
-                            rdr.Close();
-                            cmd = new SqlCeCommand("select count(*) from " + idcard.tableName, conn);
-                            enrolledLabel.Text += cmd.ExecuteScalar().ToString();
+                //                i++;
 
-                            cmd = new SqlCeCommand("select count(*) from " + extraTableName, conn);
-                            attendedLabel.Text += cmd.ExecuteScalar().ToString();
 
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.ToString());
-                    }
-                    break;
+                //            }
+                //            rdr.Close();
+                //            cmd = new SqlCeCommand("select count(*) from " + idcard.tableName, conn);
+                //            enrolledLabel.Text += cmd.ExecuteScalar().ToString();
+
+                //            cmd = new SqlCeCommand("select count(*) from " + extraTableName, conn);
+                //            attendedLabel.Text += cmd.ExecuteScalar().ToString();
+
+                //        }
+                //    }
+                //    catch (Exception ex)
+                //    {
+                //        MessageBox.Show(ex.ToString());
+                //    }
+                //    break;
                 case "Microsoft SQL Server":
                     try
                     {

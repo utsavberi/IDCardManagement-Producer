@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
-using System.Data.SqlServerCe;
+//using System.Data.SqlServerCe;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -80,7 +80,7 @@ namespace IDCardManagement
 
         }
 
-        SqlCeDataAdapter sqlCeAdapter;
+        //SqlCeDataAdapter sqlCeAdapter;
         SqlDataAdapter sqlAdapter;
         DataTable dTable;
         BindingSource bSource;
@@ -88,32 +88,32 @@ namespace IDCardManagement
         {
             switch (idcard.dataSourceType)
             {
-                case "Microsoft SQL Server Compact 3.5":
-                    try
-                    {
-                        SqlCeConnection c = new SqlCeConnection(str);
-                        {
-                            c.Open();
-                            sqlCeAdapter = new SqlCeDataAdapter("SELECT * FROM " + idcard.tableName, c);
-                            {
-                                dTable = new DataTable();
-                                sqlCeAdapter.Fill(dTable);
-                                SqlCeCommandBuilder sqlCommand = new SqlCeCommandBuilder(sqlCeAdapter);
-                                sqlCeAdapter.InsertCommand = sqlCommand.GetInsertCommand();
-                                sqlCeAdapter.UpdateCommand = sqlCommand.GetUpdateCommand();
-                                sqlCeAdapter.DeleteCommand = sqlCommand.GetDeleteCommand();
-                                sqlCeAdapter.InsertCommand.Connection = c;
+                //case "Microsoft SQL Server Compact 3.5":
+                //    try
+                //    {
+                //        SqlCeConnection c = new SqlCeConnection(str);
+                //        {
+                //            c.Open();
+                //            sqlCeAdapter = new SqlCeDataAdapter("SELECT * FROM " + idcard.tableName, c);
+                //            {
+                //                dTable = new DataTable();
+                //                sqlCeAdapter.Fill(dTable);
+                //                SqlCeCommandBuilder sqlCommand = new SqlCeCommandBuilder(sqlCeAdapter);
+                //                sqlCeAdapter.InsertCommand = sqlCommand.GetInsertCommand();
+                //                sqlCeAdapter.UpdateCommand = sqlCommand.GetUpdateCommand();
+                //                sqlCeAdapter.DeleteCommand = sqlCommand.GetDeleteCommand();
+                //                sqlCeAdapter.InsertCommand.Connection = c;
 
-                                //sqlAdapter.InsertCommand = new SqlCeCommand("insert into "+idcard.tableName+" values ");
-                                bSource = new BindingSource();
-                                bSource.DataSource = dTable;
-                                dataGridView1.DataSource = bSource;
-                                //dataGridView1.DataSource = t;
-                            }
-                        }
-                    }
-                    catch (Exception ex) { MessageBox.Show("Invalid file format :" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
-                    break;
+                //                //sqlAdapter.InsertCommand = new SqlCeCommand("insert into "+idcard.tableName+" values ");
+                //                bSource = new BindingSource();
+                //                bSource.DataSource = dTable;
+                //                dataGridView1.DataSource = bSource;
+                //                //dataGridView1.DataSource = t;
+                //            }
+                //        }
+                //    }
+                //    catch (Exception ex) { MessageBox.Show("Invalid file format :" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+                //    break;
                 case "Microsoft SQL Server":
                     string cntu="";
                     try
@@ -656,90 +656,90 @@ namespace IDCardManagement
                 string cnstr = "";
                 switch (idcard.dataSourceType)
                 {
-                    case "Microsoft SQL Server Compact 3.5":
-                        using (SqlCeConnection con = new SqlCeConnection(idcard.connectionString))
-                        {
-                            try
-                            {
-                                con.Open();
-                                cnstr = "select * from " + extraTableName + " where " + idcard.primaryKey + " = '" + id + "'";
-                                using (SqlCeCommand cmd1 = new SqlCeCommand(cnstr, con))
-                                {
+                    //case "Microsoft SQL Server Compact 3.5":
+                    //    using (SqlCeConnection con = new SqlCeConnection(idcard.connectionString))
+                    //    {
+                    //        try
+                    //        {
+                    //            con.Open();
+                    //            cnstr = "select * from " + extraTableName + " where " + idcard.primaryKey + " = '" + id + "'";
+                    //            using (SqlCeCommand cmd1 = new SqlCeCommand(cnstr, con))
+                    //            {
 
-                                    SqlCeDataReader rdr = cmd1.ExecuteReader();
-
-
-
-                                    if (rdr.Read() == false)
-                                    {
-                                        rdr.Close();
-                                        using (SqlCeCommand cmd2 = new SqlCeCommand("Insert into " + extraTableName + "  Values (@id,@printtime,@machineid,@log,@oldprinttime)", con))
-                                        {
-
-                                            //cmd2.Parameters.Add("Pic", SqlDbType.Image, 0).Value = ConvertImageToByteArray(pictureContainerPanel.BackgroundImage, System.Drawing.Imaging.ImageFormat.Jpeg);
-                                            cmd2.Parameters.Add("id", SqlDbType.NVarChar).Value = id;
-                                            cmd2.Parameters.Add("printtime", SqlDbType.NVarChar).Value = DateTime.Now.ToString();
-                                            cmd2.Parameters.Add("machineid", SqlDbType.NVarChar).Value = Environment.MachineName + " : " + Environment.UserDomainName + " : " + Environment.UserName;
-                                            cmd2.Parameters.Add("log", SqlDbType.NVarChar).Value = "";
-                                            cmd2.Parameters.Add("oldprinttime", SqlDbType.NVarChar).Value = "";
-                                            cmd2.ExecuteNonQuery();
-
-                                        }
-                                        using (SqlCeCommand cmd2 = new SqlCeCommand("Insert into " + extraTableName + "pic  Values (@id,@Pic)", con))
-                                        {
-
-                                            cmd2.Parameters.Add("Pic", SqlDbType.Image, 0).Value = ConvertImageToByteArray(pictureContainerPanel.BackgroundImage, System.Drawing.Imaging.ImageFormat.Jpeg);
-                                            cmd2.Parameters.Add("id", SqlDbType.NVarChar).Value = id;
-                                            //cmd2.Parameters.Add("printtime", SqlDbType.NVarChar).Value = DateTime.Now.ToString();
-                                            //cmd2.Parameters.Add("machineid", SqlDbType.NVarChar).Value = Environment.MachineName;
-                                            //cmd2.Parameters.Add("log", SqlDbType.NVarChar).Value = "";
-                                            //cmd2.Parameters.Add("oldprinttime", SqlDbType.NVarChar).Value = "";
-                                            cmd2.ExecuteNonQuery();
-
-                                        }
-                                    }
-                                    else
-                                    {
-                                        rdr.Close();
-                                        oldprinttime = rdr["printtime"].ToString();
-                                        InputBox ib = new InputBox();
-                                        if (ib.ShowDialog() == DialogResult.OK)
-                                            log = ib.value;
-                                        //InputBox.show("Enter reason for re-print..");
-                                        //log = InputBox.value;
-                                        cnstr = "update " + extraTableName + "  set printtime = '" + DateTime.Now.ToString() + "' , log = '" + log + "' ,  oldprinttime = '" + oldprinttime + "' where id = '" + id + "'";
-                                        using (SqlCeCommand cmd3 = new SqlCeCommand(cnstr, con))
-                                        {
-                                            cmd3.ExecuteNonQuery();
-                                        }
-                                        using (SqlCeCommand cmd2 = new SqlCeCommand("update " + extraTableName + "pic set pic = @Pic where id = @id", con))
-                                        {
-
-                                            cmd2.Parameters.Add("Pic", SqlDbType.Image, 0).Value = ConvertImageToByteArray(pictureContainerPanel.BackgroundImage, System.Drawing.Imaging.ImageFormat.Jpeg);
-                                            cmd2.Parameters.Add("id", SqlDbType.NVarChar).Value = id;
-                                            //cmd2.Parameters.Add("printtime", SqlDbType.NVarChar).Value = DateTime.Now.ToString();
-                                            //cmd2.Parameters.Add("machineid", SqlDbType.NVarChar).Value = Environment.MachineName;
-                                            //cmd2.Parameters.Add("log", SqlDbType.NVarChar).Value = "";
-                                            //cmd2.Parameters.Add("oldprinttime", SqlDbType.NVarChar).Value = "";
-                                            cmd2.ExecuteNonQuery();
-
-                                        }
+                    //                SqlCeDataReader rdr = cmd1.ExecuteReader();
 
 
-                                    }
 
-                                }
-                                con.Close();
-                            }
+                    //                if (rdr.Read() == false)
+                    //                {
+                    //                    rdr.Close();
+                    //                    using (SqlCeCommand cmd2 = new SqlCeCommand("Insert into " + extraTableName + "  Values (@id,@printtime,@machineid,@log,@oldprinttime)", con))
+                    //                    {
 
-                            catch (SqlCeException ex)
-                            {
-                                MessageBox.Show("myerror2 :" + ex.Message + "   " );
-                                Console.WriteLine("myerror2 :" + ex.Message + "   " );
-                            }
+                    //                        //cmd2.Parameters.Add("Pic", SqlDbType.Image, 0).Value = ConvertImageToByteArray(pictureContainerPanel.BackgroundImage, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    //                        cmd2.Parameters.Add("id", SqlDbType.NVarChar).Value = id;
+                    //                        cmd2.Parameters.Add("printtime", SqlDbType.NVarChar).Value = DateTime.Now.ToString();
+                    //                        cmd2.Parameters.Add("machineid", SqlDbType.NVarChar).Value = Environment.MachineName + " : " + Environment.UserDomainName + " : " + Environment.UserName;
+                    //                        cmd2.Parameters.Add("log", SqlDbType.NVarChar).Value = "";
+                    //                        cmd2.Parameters.Add("oldprinttime", SqlDbType.NVarChar).Value = "";
+                    //                        cmd2.ExecuteNonQuery();
 
-                        }
-                        break;
+                    //                    }
+                    //                    using (SqlCeCommand cmd2 = new SqlCeCommand("Insert into " + extraTableName + "pic  Values (@id,@Pic)", con))
+                    //                    {
+
+                    //                        cmd2.Parameters.Add("Pic", SqlDbType.Image, 0).Value = ConvertImageToByteArray(pictureContainerPanel.BackgroundImage, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    //                        cmd2.Parameters.Add("id", SqlDbType.NVarChar).Value = id;
+                    //                        //cmd2.Parameters.Add("printtime", SqlDbType.NVarChar).Value = DateTime.Now.ToString();
+                    //                        //cmd2.Parameters.Add("machineid", SqlDbType.NVarChar).Value = Environment.MachineName;
+                    //                        //cmd2.Parameters.Add("log", SqlDbType.NVarChar).Value = "";
+                    //                        //cmd2.Parameters.Add("oldprinttime", SqlDbType.NVarChar).Value = "";
+                    //                        cmd2.ExecuteNonQuery();
+
+                    //                    }
+                    //                }
+                    //                else
+                    //                {
+                    //                    rdr.Close();
+                    //                    oldprinttime = rdr["printtime"].ToString();
+                    //                    InputBox ib = new InputBox();
+                    //                    if (ib.ShowDialog() == DialogResult.OK)
+                    //                        log = ib.value;
+                    //                    //InputBox.show("Enter reason for re-print..");
+                    //                    //log = InputBox.value;
+                    //                    cnstr = "update " + extraTableName + "  set printtime = '" + DateTime.Now.ToString() + "' , log = '" + log + "' ,  oldprinttime = '" + oldprinttime + "' where id = '" + id + "'";
+                    //                    using (SqlCeCommand cmd3 = new SqlCeCommand(cnstr, con))
+                    //                    {
+                    //                        cmd3.ExecuteNonQuery();
+                    //                    }
+                    //                    using (SqlCeCommand cmd2 = new SqlCeCommand("update " + extraTableName + "pic set pic = @Pic where id = @id", con))
+                    //                    {
+
+                    //                        cmd2.Parameters.Add("Pic", SqlDbType.Image, 0).Value = ConvertImageToByteArray(pictureContainerPanel.BackgroundImage, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    //                        cmd2.Parameters.Add("id", SqlDbType.NVarChar).Value = id;
+                    //                        //cmd2.Parameters.Add("printtime", SqlDbType.NVarChar).Value = DateTime.Now.ToString();
+                    //                        //cmd2.Parameters.Add("machineid", SqlDbType.NVarChar).Value = Environment.MachineName;
+                    //                        //cmd2.Parameters.Add("log", SqlDbType.NVarChar).Value = "";
+                    //                        //cmd2.Parameters.Add("oldprinttime", SqlDbType.NVarChar).Value = "";
+                    //                        cmd2.ExecuteNonQuery();
+
+                    //                    }
+
+
+                    //                }
+
+                    //            }
+                    //            con.Close();
+                    //        }
+
+                    //        catch (SqlCeException ex)
+                    //        {
+                    //            MessageBox.Show("myerror2 :" + ex.Message + "   " );
+                    //            Console.WriteLine("myerror2 :" + ex.Message + "   " );
+                    //        }
+
+                    //    }
+                    //    break;
                     case "Microsoft SQL Server":
                         using (SqlConnection con = new SqlConnection(idcard.connectionString))
                         {
@@ -900,9 +900,9 @@ namespace IDCardManagement
             {
                 switch (idcard.dataSourceType)
                 {
-                    case "Microsoft SQL Server Compact 3.5":
-                        sqlCeAdapter.Update(dTable);
-                        break;
+                    //case "Microsoft SQL Server Compact 3.5":
+                    //    sqlCeAdapter.Update(dTable);
+                    //    break;
                     case "Microsoft SQL Server":
                         sqlAdapter.Update(dTable);
                         break;

@@ -30,33 +30,33 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.ApplicantDataSet = new IDCardManagement.ApplicantDataSet();
+            //this.ApplicantDataSet = new IDCardManagement.ApplicantDataSet();
             this.utsavFinal634792753739040581extrapicBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.utsavFinal634792753739040581extrapicTableAdapter = new IDCardManagement.ApplicantDataSetTableAdapters.utsavFinal634792753739040581extrapicTableAdapter();
+            //this.utsavFinal634792753739040581extrapicTableAdapter = new IDCardManagement.ApplicantDataSetTableAdapters.utsavFinal634792753739040581extrapicTableAdapter();
             this.groupBox1 = new System.Windows.Forms.Panel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.enrolledLabel = new System.Windows.Forms.Label();
             this.attendedLabel = new System.Windows.Forms.Label();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
-            ((System.ComponentModel.ISupportInitialize)(this.ApplicantDataSet)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.utsavFinal634792753739040581extrapicBindingSource)).BeginInit();
+            //((System.ComponentModel.ISupportInitialize)(this.ApplicantDataSet)).BeginInit();
+            //((System.ComponentModel.ISupportInitialize)(this.utsavFinal634792753739040581extrapicBindingSource)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // ApplicantDataSet
             // 
-            this.ApplicantDataSet.DataSetName = "ApplicantDataSet";
-            this.ApplicantDataSet.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema;
+            //this.ApplicantDataSet.DataSetName = "ApplicantDataSet";
+            //this.ApplicantDataSet.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema;
             // 
             // utsavFinal634792753739040581extrapicBindingSource
             // 
-            this.utsavFinal634792753739040581extrapicBindingSource.DataMember = "utsavFinal634792753739040581extrapic";
-            this.utsavFinal634792753739040581extrapicBindingSource.DataSource = this.ApplicantDataSet;
+            //this.utsavFinal634792753739040581extrapicBindingSource.DataMember = "utsavFinal634792753739040581extrapic";
+            //this.utsavFinal634792753739040581extrapicBindingSource.DataSource = this.ApplicantDataSet;
             // 
             // utsavFinal634792753739040581extrapicTableAdapter
             // 
-            this.utsavFinal634792753739040581extrapicTableAdapter.ClearBeforeFill = true;
+           // this.utsavFinal634792753739040581extrapicTableAdapter.ClearBeforeFill = true;
             // 
             // groupBox1
             // 
@@ -122,8 +122,8 @@
             this.Name = "Form1";
             this.Text = "Report";
             this.Load += new System.EventHandler(this.Form1_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.ApplicantDataSet)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.utsavFinal634792753739040581extrapicBindingSource)).EndInit();
+            //((System.ComponentModel.ISupportInitialize)(this.ApplicantDataSet)).EndInit();
+            //((System.ComponentModel.ISupportInitialize)(this.utsavFinal634792753739040581extrapicBindingSource)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
@@ -136,8 +136,8 @@
         #endregion
 
         private System.Windows.Forms.BindingSource utsavFinal634792753739040581extrapicBindingSource;
-        private ApplicantDataSet ApplicantDataSet;
-        private ApplicantDataSetTableAdapters.utsavFinal634792753739040581extrapicTableAdapter utsavFinal634792753739040581extrapicTableAdapter;
+       // private ApplicantDataSet ApplicantDataSet;
+        //private ApplicantDataSetTableAdapters.utsavFinal634792753739040581extrapicTableAdapter utsavFinal634792753739040581extrapicTableAdapter;
         private System.Windows.Forms.Panel groupBox1;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.Label attendedLabel;
