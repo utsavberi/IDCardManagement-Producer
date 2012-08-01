@@ -32,7 +32,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form2));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.newToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -48,6 +48,7 @@
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.printToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.webcamToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.picFromFiletoolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator109 = new System.Windows.Forms.ToolStripSeparator();
             this.reportsToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
@@ -78,7 +79,6 @@
             this.rightPanel = new System.Windows.Forms.Panel();
             this.queryTxt = new System.Windows.Forms.TextBox();
             this.selectFieldComboBox = new System.Windows.Forms.ComboBox();
-            this.picFromFiletoolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -252,6 +252,17 @@
             this.webcamToolStripButton.Text = "Capture Image";
             this.webcamToolStripButton.Click += new System.EventHandler(this.toolStripButton3_Click);
             // 
+            // picFromFiletoolStripButton
+            // 
+            this.picFromFiletoolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.picFromFiletoolStripButton.Enabled = false;
+            this.picFromFiletoolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("picFromFiletoolStripButton.Image")));
+            this.picFromFiletoolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.picFromFiletoolStripButton.Name = "picFromFiletoolStripButton";
+            this.picFromFiletoolStripButton.Size = new System.Drawing.Size(23, 24);
+            this.picFromFiletoolStripButton.Text = "Choose Picture from File..";
+            this.picFromFiletoolStripButton.Click += new System.EventHandler(this.picFromFiletoolStripButton_Click);
+            // 
             // toolStripSeparator109
             // 
             this.toolStripSeparator109.Name = "toolStripSeparator109";
@@ -287,6 +298,10 @@
             this.panel1.Size = new System.Drawing.Size(474, 257);
             this.panel1.TabIndex = 1;
             this.panel1.Visible = false;
+            this.panel1.Click += new System.EventHandler(this.panel1_Click);
+            this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
+            this.panel1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseDown);
+            this.panel1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseMove);
             this.panel1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseUp);
             // 
             // titleLbl
@@ -422,9 +437,9 @@
             // 
             // dataGridView1
             // 
-            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.Black;
-            this.dataGridView1.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.Color.Black;
+            this.dataGridView1.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle4;
             this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -495,17 +510,6 @@
             this.selectFieldComboBox.TabIndex = 6;
             this.selectFieldComboBox.Text = "Select Field...";
             this.selectFieldComboBox.SelectedIndexChanged += new System.EventHandler(this.selectFieldComboBox_SelectedIndexChanged);
-            // 
-            // picFromFiletoolStripButton
-            // 
-            this.picFromFiletoolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.picFromFiletoolStripButton.Enabled = false;
-            this.picFromFiletoolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("picFromFiletoolStripButton.Image")));
-            this.picFromFiletoolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.picFromFiletoolStripButton.Name = "picFromFiletoolStripButton";
-            this.picFromFiletoolStripButton.Size = new System.Drawing.Size(23, 24);
-            this.picFromFiletoolStripButton.Text = "Choose Picture from File..";
-            this.picFromFiletoolStripButton.Click += new System.EventHandler(this.picFromFiletoolStripButton_Click);
             // 
             // Form2
             // 

@@ -36,7 +36,7 @@ namespace IDCardManagement
         public Form2(string fileopen)
         {
             InitializeComponent();
-         
+
             if (fileopen != null)
             {
                 filename = fileopen;
@@ -115,13 +115,13 @@ namespace IDCardManagement
                 //    catch (Exception ex) { MessageBox.Show("Invalid file format :" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
                 //    break;
                 case "Microsoft SQL Server":
-                    string cntu="";
+                    string cntu = "";
                     try
                     {
                         SqlConnection c = new SqlConnection(str);
                         {
                             c.Open();
-                             cntu = "SELECT * FROM " + idcard.tableName;
+                            cntu = "SELECT * FROM " + idcard.tableName;
                             sqlAdapter = new SqlDataAdapter(cntu, c);
                             {
                                 dTable = new DataTable();
@@ -140,7 +140,7 @@ namespace IDCardManagement
                             }
                         }
                     }
-                    catch (Exception ex) { MessageBox.Show("Invalid file format : " + ex.Message +"    "+cntu, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+                    catch (Exception ex) { MessageBox.Show("Invalid file format : " + ex.Message + "    " + cntu, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
                     break;
             }
 
@@ -157,7 +157,7 @@ namespace IDCardManagement
             toolStripStatusLabel1.Text = "Select Records on the right to fill form..";//"Right Click to add Fields...";
             titleLbl.Text = idcard.title;
             titleLbl.MouseDown += tmplbl_MouseDown;
-            ControlMover.Init(titleLbl);
+            ControlMover.Init(titleLbl, panel1, true);
             // if (pictureBox1 != null) //ControlMover.Init(pictureBox1);
             panel1.Visible = true;
             loadDataGrid(idcard.connectionString);
@@ -252,7 +252,7 @@ namespace IDCardManagement
                                     tmp.Left = Convert.ToInt32(reader.GetAttribute("left"));
                                     panel1.Controls.Add(tmp);
                                     tmp.MouseDown += tmplbl_MouseDown;
-                                    ControlMover.Init(tmp);
+                                    ControlMover.Init(tmp, panel1, true);
                                     tmp.AutoSize = true;
                                     tmp.Font = (Font)TypeDescriptor.GetConverter(typeof(Font)).ConvertFromString(reader.GetAttribute("font"));
                                     tmp.BackColor = Color.FromArgb(Convert.ToInt32(reader.GetAttribute("backcolor")));
@@ -321,13 +321,13 @@ namespace IDCardManagement
             tmp.Top = Y;
             tmp.AutoSize = true;
             tmp.MouseDown += tmplbl_MouseDown;
-            ControlMover.Init(tmp);
+            ControlMover.Init(tmp, panel1, true);
             panel1.Controls.Add(tmp);
         }
 
         private void tmplbl_MouseDown(object sender, MouseEventArgs e)
         {
-            if (Control.ModifierKeys != Keys.Control)
+            if (Control.ModifierKeys != Keys.Control && Control.ModifierKeys != Keys.Shift && (sender as Label).BorderStyle != BorderStyle.FixedSingle)
                 foreach (Control ctl in panel1.Controls)
                 {
                     if (ctl is Label) { ((Label)ctl).BorderStyle = BorderStyle.None; }
@@ -343,7 +343,11 @@ namespace IDCardManagement
         }
 
         private void panel1_MouseUp(object sender, MouseEventArgs e)
-        {
+        { foreach (Control ctl in panel1.Controls)
+            {
+                if (ctl is Label && rect.IntersectsWith(ctl.Bounds)) (ctl as Label).BorderStyle = BorderStyle.FixedSingle;
+            } 
+            rect = new Rectangle(0, 0, 0, 0);
             if (e.Button == MouseButtons.Right)
             {
                 X = Cursor.Position.X - panel1.Left;
@@ -355,7 +359,13 @@ namespace IDCardManagement
 
         private void panel1_Click(object sender, EventArgs e)
         {
-            foreach (Control ctl in panel1.Controls) { if (ctl is Label) { ((Label)ctl).BorderStyle = BorderStyle.None; } }
+            foreach (Control ctl in panel1.Controls)
+            {
+                if (ctl is Label)
+                {
+                    ((Label)ctl).BorderStyle = BorderStyle.None;
+                }
+            }
 
         }
 
@@ -642,7 +652,7 @@ namespace IDCardManagement
                 string id = "";
                 try
                 {
-                     id = dataGridView1.SelectedRows[0].Cells[i].Value.ToString();
+                    id = dataGridView1.SelectedRows[0].Cells[i].Value.ToString();
                 }
                 catch (Exception x)
                 {
@@ -756,7 +766,7 @@ namespace IDCardManagement
 
                                     if (rdr.Read() == false)
                                     {
-                                        rdr.Close(); 
+                                        rdr.Close();
                                         using (SqlCommand cmd22 = new SqlCommand("Insert into " + extraTableName + "  Values (@id,@printtime,@machineid,@log,@oldprinttime)", con))
                                         {
 
@@ -784,12 +794,12 @@ namespace IDCardManagement
 
                                             }
                                         }
-                                        catch (Exception ex) { Console.WriteLine(ex.Message+"  uttutut"); }
+                                        catch (Exception ex) { Console.WriteLine(ex.Message + "  uttutut"); }
                                     }
                                     else
                                     {
-                                        
-                                        oldprinttime = rdr["printtime"].ToString();rdr.Close();
+
+                                        oldprinttime = rdr["printtime"].ToString(); rdr.Close();
                                         InputBox ib = new InputBox();
                                         if (ib.ShowDialog() == DialogResult.OK)
                                             log = ib.value;
@@ -822,7 +832,7 @@ namespace IDCardManagement
                             catch (SqlException ex)
                             {
                                 MessageBox.Show("myerror2 :" + ex.Message + "   ");
-                                Console.WriteLine("myerror2 :" + ex.Message + "   " );
+                                Console.WriteLine("myerror2 :" + ex.Message + "   ");
                             }
 
                         }
@@ -921,7 +931,7 @@ namespace IDCardManagement
 
         private void toolStripButton3_Click_1(object sender, EventArgs e)
         {
-            Form1 frm= new Form1(idcard,extraTableName);
+            Form1 frm = new Form1(idcard, extraTableName);
             frm.Show();
         }
 
@@ -939,6 +949,26 @@ namespace IDCardManagement
                 //idcard.backgroundImage = new System.Drawing.Bitmap(openFileDialog2.FileName);
                 pictureContainerPanel.BackgroundImage = new System.Drawing.Bitmap(openFileDialog2.FileName);
             }
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+            using (Pen pen = new Pen(Color.Gray, 2))
+            {
+                e.Graphics.DrawRectangle(pen, rect);
+            }
+        }
+        Rectangle rect;
+        private void panel1_MouseDown(object sender, MouseEventArgs e)
+        {
+            rect = new Rectangle(e.X, e.Y, 0, 0);
+        }
+
+        private void panel1_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+                rect = new Rectangle(rect.Left, rect.Top, e.X - rect.Left, e.Y - rect.Top);
+            panel1.Invalidate();
         }
 
 
