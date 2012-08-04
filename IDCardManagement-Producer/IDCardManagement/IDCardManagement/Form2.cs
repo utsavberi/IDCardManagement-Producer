@@ -28,6 +28,7 @@ namespace IDCardManagement
 
         public Form2()
         {
+           // SplashScreen.showSplashScreen();
             InitializeComponent();
             webcamStatus = 0;
         }
@@ -70,7 +71,9 @@ namespace IDCardManagement
 
         private void Form2_Load(object o, EventArgs e)
         {
-
+            //Hide();
+            
+            //Show();
             toolStripStatusLabel1.Text = "Click on Open to start working...";
             foreach (FontFamily font in System.Drawing.FontFamily.Families)
             {
@@ -140,7 +143,7 @@ namespace IDCardManagement
                             }
                         }
                     }
-                    catch (Exception ex) { MessageBox.Show("Invalid file format : " + ex.Message + "    " + cntu, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+                    catch (SqlException ex) { MessageBox.Show("Invalid file format 3 : " + ex.Message +ex.Number+ex.State+ "    " + cntu, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
                     break;
             }
 
@@ -234,7 +237,7 @@ namespace IDCardManagement
 
             panel1.Controls.Clear();
             panel1.ContextMenuStrip = contextMenuStrip1;
-
+            this.Cursor = Cursors.WaitCursor;
             try
             {
                 using (XmlTextReader reader = new XmlTextReader(filename))
@@ -306,8 +309,9 @@ namespace IDCardManagement
                 idcard = new IDCard(connectionString, dataSourceType, tableName, primaryKey, dimensions, backgroundImage, fields, selectedFields, title);
                 Form2_LoadFile();
             }
-            catch (Exception ex) { MessageBox.Show("Invalid file format" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
-
+            catch (SqlException ex) { MessageBox.Show("SQL Exception :" + ex.Message + ex.InnerException + ex.Number, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+            catch (Exception ex) { MessageBox.Show("Invalid File Format 2 :" + ex.Message ); ; }
+            this.Cursor = Cursors.Default;
         }
 
         private void tmpToolStripItem_Click(object sender, EventArgs e)
